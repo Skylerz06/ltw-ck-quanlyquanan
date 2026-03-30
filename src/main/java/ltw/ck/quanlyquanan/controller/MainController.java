@@ -3,6 +3,7 @@ package ltw.ck.quanlyquanan.controller;
 import ltw.ck.quanlyquanan.view.LoginView;
 import ltw.ck.quanlyquanan.view.MainView;
 import ltw.ck.quanlyquanan.view.NhanVienView;
+import ltw.ck.quanlyquanan.view.KhachHangView;
 
 import javax.swing.*;
 
@@ -27,9 +28,7 @@ public class MainController {
                 //monAnView.setVisible(true);
         );
 
-        view.getBtnKhachHang().addActionListener(e ->
-                JOptionPane.showMessageDialog(view, "Mở màn hình Quản lý khách hàng")
-        );
+        view.getBtnKhachHang().addActionListener(e -> moManHinhKhachHang());
 
         view.getBtnNhanVien().addActionListener(e -> moManHinhNhanVien());
 
@@ -80,6 +79,12 @@ public class MainController {
         NhanVienView nhanVienView = new NhanVienView();
         NhanVienController nhanVienController = new NhanVienController(nhanVienView);
         nhanVienController.showNhanVienView();
+    }
+
+    private void moManHinhKhachHang() {
+        KhachHangView khachHangView = new KhachHangView();
+        KhachHangController khachHangController = new KhachHangController(khachHangView);
+        khachHangController.showKhachHangView();
     }
 
     public void showMainView() {
