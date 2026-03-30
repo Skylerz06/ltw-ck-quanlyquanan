@@ -1,7 +1,8 @@
 package ltw.ck.quanlyquanan.controller;
 
-import ltw.ck.quanlyquanan.view.MainView;
 import ltw.ck.quanlyquanan.view.LoginView;
+import ltw.ck.quanlyquanan.view.MainView;
+import ltw.ck.quanlyquanan.view.NhanVienView;
 
 import javax.swing.*;
 
@@ -30,9 +31,7 @@ public class MainController {
                 JOptionPane.showMessageDialog(view, "Mở màn hình Quản lý khách hàng")
         );
 
-        view.getBtnNhanVien().addActionListener(e ->
-                JOptionPane.showMessageDialog(view, "Mở màn hình Quản lý nhân viên")
-        );
+        view.getBtnNhanVien().addActionListener(e -> moManHinhNhanVien());
 
         view.getBtnHoaDon().addActionListener(e ->
                 JOptionPane.showMessageDialog(view, "Mở màn hình Lập hóa đơn")
@@ -75,6 +74,12 @@ public class MainController {
         if (confirm == JOptionPane.YES_OPTION) {
             view.dispose();
         }
+    }
+
+    private void moManHinhNhanVien() {
+        NhanVienView nhanVienView = new NhanVienView();
+        NhanVienController nhanVienController = new NhanVienController(nhanVienView);
+        nhanVienController.showNhanVienView();
     }
 
     public void showMainView() {
