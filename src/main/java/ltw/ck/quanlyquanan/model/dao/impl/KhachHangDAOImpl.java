@@ -17,6 +17,8 @@ public class KhachHangDAOImpl implements KhachHangDAO {
             return em.createQuery("""
                     SELECT k
                     FROM KhachHang k
+                    LEFT JOIN FETCH k.loaiKhachHang
+                    ORDER BY k.maKh
                     """, KhachHang.class).getResultList();
         } finally {
             em.close();
@@ -24,24 +26,35 @@ public class KhachHangDAOImpl implements KhachHangDAO {
     }
 
     @Override
-    public KhachHang findById(Long id){
+    public KhachHang findById(Long id) {
         EntityManager em = JpaUtil.getEmf().createEntityManager();
-        try{
-            return em.find(KhachHang.class, id);
+        try {
+            List<KhachHang> result = em.createQuery("""
+                SELECT kh
+                FROM KhachHang kh
+                LEFT JOIN FETCH kh.loaiKhachHang
+                WHERE kh.maKh = :id
+                """, KhachHang.class)
+                    .setParameter("id", id)
+                    .getResultList();
+
+            return result.isEmpty() ? null : result.get(0);
         } finally {
             em.close();
         }
     }
 
     @Override
-    public List<KhachHang> findByTenKh(String tenKh){
+    public List<KhachHang> findByTenKh(String tenKh) {
         EntityManager em = JpaUtil.getEmf().createEntityManager();
         try {
             return em.createQuery("""
-                    SELECT k
-                    FROM KhachHang k
-                    WHERE k.tenKh LIKE :tenKh
-                    """, KhachHang.class)
+                SELECT kh
+                FROM KhachHang kh
+                LEFT JOIN FETCH kh.loaiKhachHang
+                WHERE LOWER(kh.tenKh) LIKE LOWER(:tenKh)
+                ORDER BY kh.tenKh
+                """, KhachHang.class)
                     .setParameter("tenKh", "%" + tenKh + "%")
                     .getResultList();
         } finally {
