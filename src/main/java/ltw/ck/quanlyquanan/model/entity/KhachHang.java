@@ -65,4 +65,6 @@ public class KhachHang {
     public void setLstHoaDon(List<HoaDon> lstHoaDon) {
         this.lstHoaDon = lstHoaDon;
     }
+
+    public String toString() { return tenKh;}
 }

@@ -53,4 +53,6 @@ public class Ban {
     public void setLstHoaDon(List<HoaDon> lstHoaDon) {
         this.lstHoaDon = lstHoaDon;
     }
+
+    public String toString() { return tenBan;}
 }

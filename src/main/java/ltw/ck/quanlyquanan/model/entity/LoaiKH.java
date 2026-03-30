@@ -54,4 +54,6 @@ public class LoaiKH {
     public void setLstKhachHang(List<KhachHang> lstKhachHang) {
         this.lstKhachHang = lstKhachHang;
     }
+
+    public String toString() { return tenLoaiKh;}
 }
