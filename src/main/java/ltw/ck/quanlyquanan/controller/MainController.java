@@ -1,4 +1,4 @@
 package ltw.ck.quanlyquanan.controller;
 
-public class placeholder {
+public class MainController {
 }
