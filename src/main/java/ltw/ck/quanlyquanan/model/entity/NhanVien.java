@@ -8,15 +8,16 @@ public class NhanVien {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ma_nv")
     private Long maNV;
 
-    @Column(nullable = false, length = 150)
+    @Column(name = "ho_ten", nullable = false, length = 100)
     private String hoTen;
 
-    @Column(length = 255)
+    @Column(name = "dia_chi", length = 255)
     private String diaChi;
 
-    @Column(length = 10)
+    @Column(name = "sdt", nullable = false, unique = true, length = 15)
     private String sdt;
 
     @OneToOne(mappedBy = "nhanVien", cascade = CascadeType.ALL)

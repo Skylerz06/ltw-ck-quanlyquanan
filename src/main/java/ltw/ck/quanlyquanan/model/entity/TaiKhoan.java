@@ -8,16 +8,17 @@ public class TaiKhoan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ma_tk")
     private Long maTK;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "ten_dang_nhap", nullable = false, unique = true, length = 50)
     private String tenDangNhap;
 
-    @Column(nullable = false)
+    @Column(name = "mat_khau", nullable = false, length = 255)
     private String matKhau;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ma_nv", unique = true)
+    @JoinColumn(name = "ma_nv", unique = true, nullable = false)
     private NhanVien nhanVien;
 
     public TaiKhoan() {

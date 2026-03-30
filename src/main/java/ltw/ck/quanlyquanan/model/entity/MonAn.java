@@ -8,16 +8,17 @@ public class MonAn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ma_mon")
     private Long maMon;
 
-    @Column(nullable = false, length = 150)
+    @Column(name = "ten_mon", nullable = false, unique = true, length = 100)
     private String tenMon;
 
-    @Column(nullable = false)
+    @Column(name = "don_gia", nullable = false)
     private Double donGia;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ma_loai")
+    @JoinColumn(name = "ma_loai", nullable = false)
     private LoaiMonAn loaiMonAn;
 
     public MonAn() {

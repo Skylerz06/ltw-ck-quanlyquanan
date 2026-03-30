@@ -10,9 +10,10 @@ public class LoaiMonAn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ma_loai")
     private Long maLoai;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "ten_loai", nullable = false, unique = true, length = 100)
     private String tenLoai;
 
     @OneToMany(mappedBy = "loaiMonAn", cascade = CascadeType.ALL)
