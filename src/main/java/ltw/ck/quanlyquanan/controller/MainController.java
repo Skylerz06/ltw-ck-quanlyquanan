@@ -1,6 +1,7 @@
 package ltw.ck.quanlyquanan.controller;
 
 import ltw.ck.quanlyquanan.view.MainView;
+import ltw.ck.quanlyquanan.view.LoginView;
 
 import javax.swing.*;
 
@@ -55,11 +56,11 @@ public class MainController {
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
-            JOptionPane.showMessageDialog(view, "Đăng xuất thành công");
             view.dispose();
 
-            // TODO: Mở lại LoginView ở đây
-            // new LoginController(new LoginView());
+            LoginView loginView = new LoginView();
+            LoginController loginController = new LoginController(loginView);
+            loginController.showLoginView();
         }
     }
 
