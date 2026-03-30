@@ -5,7 +5,7 @@
                                  https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
              version="3.2">
 
-    <persistence-unit name="student-pu">
+    <persistence-unit name="quanan-pu">
         <class>ltw.ck.quanlyquanan.model.entity.Ban</class>
         <class>ltw.ck.quanlyquanan.model.entity.HoaDon</class>
         <class>ltw.ck.quanlyquanan.model.entity.KhachHang</class>
