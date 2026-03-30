@@ -10,10 +10,10 @@ import java.util.ArrayList;
 public class KhachHang {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ma_khach_hang")
+    @Column(name = "ma_kh")
     private Long maKh;
 
-    @Column(name = "ten_khach_hang", nullable = false, length = 100)
+    @Column(name = "ten_kh", nullable = false, length = 100)
     private String tenKh;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
