@@ -14,5 +14,5 @@ public interface HoaDonDAO {
 
     void save(HoaDon entity);
     void update(HoaDon entity);
-//    Không có delete.
+    void delete(Long id);
 }

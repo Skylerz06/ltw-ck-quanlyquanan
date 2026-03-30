@@ -14,7 +14,7 @@
         <class>ltw.ck.quanlyquanan.model.entity.MonAn</class>
         <class>ltw.ck.quanlyquanan.model.entity.NhanVien</class>
         <class>ltw.ck.quanlyquanan.model.entity.TaiKhoan</class>
-<!--        Tạm chưa thêm chitiethd-->
+        <class>ltw.ck.quanlyquanan.model.entity.ChiTietHD</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.url"
