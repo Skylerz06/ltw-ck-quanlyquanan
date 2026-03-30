@@ -16,7 +16,7 @@ public class LoaiMonAn {
     private String tenLoai;
 
     @OneToMany(mappedBy = "loaiMonAn", cascade = CascadeType.ALL)
-    private List<MonAn> monAns = new ArrayList<>();
+    private List<MonAn> lstMonAn = new ArrayList<>();
 
     public LoaiMonAn() {
     }
@@ -33,8 +33,8 @@ public class LoaiMonAn {
         return tenLoai;
     }
 
-    public List<MonAn> getMonAns() {
-        return monAns;
+    public List<MonAn> getLstMonAn() {
+        return lstMonAn;
     }
 
     public void setTenLoai(String tenLoai) {
@@ -42,12 +42,12 @@ public class LoaiMonAn {
     }
 
     public void addMonAn(MonAn monAn) {
-        monAns.add(monAn);
+        lstMonAn.add(monAn);
         monAn.setLoaiMonAn(this);
     }
 
     public void removeMonAn(MonAn monAn) {
-        monAns.remove(monAn);
+        lstMonAn.remove(monAn);
         monAn.setLoaiMonAn(null);
     }
 
