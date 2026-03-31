@@ -1,9 +1,10 @@
 package ltw.ck.quanlyquanan.controller;
 
+import ltw.ck.quanlyquanan.view.KhachHangView;
 import ltw.ck.quanlyquanan.view.LoginView;
 import ltw.ck.quanlyquanan.view.MainView;
+import ltw.ck.quanlyquanan.view.MonAnView;
 import ltw.ck.quanlyquanan.view.NhanVienView;
-import ltw.ck.quanlyquanan.view.KhachHangView;
 
 import javax.swing.*;
 
@@ -21,12 +22,7 @@ public class MainController {
     }
 
     private void registerEvents() {
-        view.getBtnMonAn().addActionListener(e ->
-                JOptionPane.showMessageDialog(view, "Mở màn hình Quản lý món ăn")
-                //MonAnView monAnView = new MonAnView();
-                //new MonAnController(monAnView);
-                //monAnView.setVisible(true);
-        );
+        view.getBtnMonAn().addActionListener(e -> moManHinhMonAn());
 
         view.getBtnKhachHang().addActionListener(e -> moManHinhKhachHang());
 
@@ -79,6 +75,12 @@ public class MainController {
         NhanVienView nhanVienView = new NhanVienView();
         NhanVienController nhanVienController = new NhanVienController(nhanVienView);
         nhanVienController.showNhanVienView();
+    }
+
+    private void moManHinhMonAn() {
+        MonAnView monAnView = new MonAnView();
+        MonAnController monAnController = new MonAnController(monAnView);
+        monAnController.showMonAnView();
     }
 
     private void moManHinhKhachHang() {
