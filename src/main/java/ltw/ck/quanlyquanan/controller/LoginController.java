@@ -3,6 +3,7 @@ package ltw.ck.quanlyquanan.controller;
 import ltw.ck.quanlyquanan.model.dao.TaiKhoanDAO;
 import ltw.ck.quanlyquanan.model.dao.impl.TaiKhoanDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
+import ltw.ck.quanlyquanan.services.AppSession;
 import ltw.ck.quanlyquanan.view.LoginView;
 import ltw.ck.quanlyquanan.view.MainView;
 
@@ -56,6 +57,8 @@ public class LoginController {
                 view.getTxtMatKhau().requestFocus();
                 return;
             }
+
+            AppSession.setCurrentTaiKhoan(taiKhoan);
 
             String tenHienThi = taiKhoan.getNhanVien() != null
                     ? taiKhoan.getNhanVien().getHoTen()

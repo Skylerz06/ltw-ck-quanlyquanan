@@ -1,5 +1,7 @@
 package ltw.ck.quanlyquanan.controller;
 
+import ltw.ck.quanlyquanan.services.AppSession;
+import ltw.ck.quanlyquanan.view.HoaDonView;
 import ltw.ck.quanlyquanan.view.KhachHangView;
 import ltw.ck.quanlyquanan.view.LoginView;
 import ltw.ck.quanlyquanan.view.MainView;
@@ -23,21 +25,15 @@ public class MainController {
 
     private void registerEvents() {
         view.getBtnMonAn().addActionListener(e -> moManHinhMonAn());
-
         view.getBtnKhachHang().addActionListener(e -> moManHinhKhachHang());
-
         view.getBtnNhanVien().addActionListener(e -> moManHinhNhanVien());
-
-        view.getBtnHoaDon().addActionListener(e ->
-                JOptionPane.showMessageDialog(view, "Mở màn hình Lập hóa đơn")
-        );
+        view.getBtnHoaDon().addActionListener(e -> moManHinhHoaDon());
 
         view.getBtnThongKe().addActionListener(e ->
                 JOptionPane.showMessageDialog(view, "Mở màn hình Thống kê")
         );
 
         view.getBtnDangXuat().addActionListener(e -> dangXuat());
-
         view.getBtnThoat().addActionListener(e -> thoatUngDung());
     }
 
@@ -50,6 +46,7 @@ public class MainController {
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
+            AppSession.clear();
             view.dispose();
 
             LoginView loginView = new LoginView();
@@ -87,6 +84,12 @@ public class MainController {
         KhachHangView khachHangView = new KhachHangView();
         KhachHangController khachHangController = new KhachHangController(khachHangView);
         khachHangController.showKhachHangView();
+    }
+
+    private void moManHinhHoaDon() {
+        HoaDonView hoaDonView = new HoaDonView();
+        HoaDonController hoaDonController = new HoaDonController(hoaDonView);
+        hoaDonController.showHoaDonView();
     }
 
     public void showMainView() {
