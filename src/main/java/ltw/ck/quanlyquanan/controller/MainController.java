@@ -7,6 +7,7 @@ import ltw.ck.quanlyquanan.view.LoginView;
 import ltw.ck.quanlyquanan.view.MainView;
 import ltw.ck.quanlyquanan.view.MonAnView;
 import ltw.ck.quanlyquanan.view.NhanVienView;
+import ltw.ck.quanlyquanan.view.ThongKeView;
 
 import javax.swing.*;
 
@@ -28,10 +29,7 @@ public class MainController {
         view.getBtnKhachHang().addActionListener(e -> moManHinhKhachHang());
         view.getBtnNhanVien().addActionListener(e -> moManHinhNhanVien());
         view.getBtnHoaDon().addActionListener(e -> moManHinhHoaDon());
-
-        view.getBtnThongKe().addActionListener(e ->
-                JOptionPane.showMessageDialog(view, "Mở màn hình Thống kê")
-        );
+        view.getBtnThongKe().addActionListener(e -> moManHinhThongKe());
 
         view.getBtnDangXuat().addActionListener(e -> dangXuat());
         view.getBtnThoat().addActionListener(e -> thoatUngDung());
@@ -90,6 +88,12 @@ public class MainController {
         HoaDonView hoaDonView = new HoaDonView();
         HoaDonController hoaDonController = new HoaDonController(hoaDonView);
         hoaDonController.showHoaDonView();
+    }
+
+    private void moManHinhThongKe() {
+        ThongKeView thongKeView = new ThongKeView();
+        ThongKeController thongKeController = new ThongKeController(thongKeView);
+        thongKeController.showThongKeView();
     }
 
     public void showMainView() {
