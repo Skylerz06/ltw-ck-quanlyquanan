@@ -1,10 +1,10 @@
 package ltw.ck.quanlyquanan.view;
 
 import ltw.ck.quanlyquanan.model.entity.Ban;
-import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
+import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -83,6 +83,7 @@ public class HoaDonPanel extends JPanel {
 
         txtMaHD.setEditable(false);
         txtNgayLap.setEditable(false);
+        cboTrangThai.setEnabled(false);
 
         JLabel lblTitle = new JLabel("LẬP HÓA ĐƠN", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
@@ -94,7 +95,6 @@ public class HoaDonPanel extends JPanel {
 
         cardPanel.add(createLapHoaDonPanel(), CARD_LAP_HOA_DON);
         cardPanel.add(createLichSuPanel(), CARD_LICH_SU);
-
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
@@ -115,6 +115,12 @@ public class HoaDonPanel extends JPanel {
     }
 
     private JPanel createLapHoaDonPanel() {
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
+        actionPanel.setBorder(BorderFactory.createTitledBorder("Thao tác hóa đơn"));
+        actionPanel.add(btnThemHoaDon);
+        actionPanel.add(btnCapNhatHoaDon);
+        actionPanel.add(btnLamMoiForm);
+
         JPanel hoaDonInfoPanel = new JPanel(new GridBagLayout());
         hoaDonInfoPanel.setBorder(BorderFactory.createTitledBorder("Thông tin hóa đơn"));
 
@@ -163,18 +169,12 @@ public class HoaDonPanel extends JPanel {
         chiTietFormPanel.add(tongTienPanel, BorderLayout.SOUTH);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, chiTietFormPanel);
-        splitPane.setResizeWeight(0.46);
-        splitPane.setDividerLocation(580);
-
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        actionPanel.setBorder(BorderFactory.createTitledBorder("Thao tác"));
-        actionPanel.add(btnThemHoaDon);
-        actionPanel.add(btnCapNhatHoaDon);
-        actionPanel.add(btnLamMoiForm);
+        splitPane.setResizeWeight(0.43);
+        splitPane.setDividerLocation(530);
 
         JPanel panel = new JPanel(new BorderLayout(0, 12));
+        panel.add(actionPanel, BorderLayout.NORTH);
         panel.add(splitPane, BorderLayout.CENTER);
-        panel.add(actionPanel, BorderLayout.SOUTH);
         return panel;
     }
 
@@ -186,9 +186,18 @@ public class HoaDonPanel extends JPanel {
         searchPanel.add(btnTimKiem);
         searchPanel.add(btnTaiLai);
 
-        JPanel leftPanel = new JPanel(new BorderLayout(0, 10));
-        leftPanel.add(searchPanel, BorderLayout.NORTH);
-        leftPanel.add(new JScrollPane(tblHoaDon), BorderLayout.CENTER);
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
+        actionPanel.setBorder(BorderFactory.createTitledBorder("Thao tác lịch sử"));
+        actionPanel.add(btnChinhSua);
+        actionPanel.add(btnXoaHoaDon);
+
+        JPanel topPanel = new JPanel(new BorderLayout(0, 10));
+        topPanel.add(searchPanel, BorderLayout.NORTH);
+        topPanel.add(actionPanel, BorderLayout.SOUTH);
+
+        JPanel hoaDonTablePanel = new JPanel(new BorderLayout());
+        hoaDonTablePanel.setBorder(BorderFactory.createTitledBorder("Danh sách hóa đơn"));
+        hoaDonTablePanel.add(new JScrollPane(tblHoaDon), BorderLayout.CENTER);
 
         JPanel detailPanel = new JPanel(new BorderLayout(0, 10));
         detailPanel.setBorder(BorderFactory.createTitledBorder("Chi tiết hóa đơn đã chọn"));
@@ -199,20 +208,12 @@ public class HoaDonPanel extends JPanel {
         tongTienPanel.add(lblTongTienLichSu);
         detailPanel.add(tongTienPanel, BorderLayout.SOUTH);
 
-        JPanel rightActionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        rightActionPanel.setBorder(BorderFactory.createTitledBorder("Thao tác"));
-        rightActionPanel.add(btnChinhSua);
-        rightActionPanel.add(btnXoaHoaDon);
-
-        JPanel rightPanel = new JPanel(new BorderLayout(0, 12));
-        rightPanel.add(detailPanel, BorderLayout.CENTER);
-        rightPanel.add(rightActionPanel, BorderLayout.SOUTH);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, hoaDonTablePanel, detailPanel);
         splitPane.setResizeWeight(0.6);
-        splitPane.setDividerLocation(740);
+        splitPane.setDividerLocation(700);
 
-        JPanel panel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel(new BorderLayout(0, 12));
+        panel.add(topPanel, BorderLayout.NORTH);
         panel.add(splitPane, BorderLayout.CENTER);
         return panel;
     }
@@ -420,6 +421,10 @@ public class HoaDonPanel extends JPanel {
         cboTrangThai.setSelectedItem(trangThai);
     }
 
+    public void setTrangThaiEditable(boolean editable) {
+        cboTrangThai.setEnabled(editable);
+    }
+
     public void clearHoaDonForm() {
         txtMaHD.setText("");
         txtNgayLap.setText("");
@@ -428,6 +433,7 @@ public class HoaDonPanel extends JPanel {
         cboKhachHang.setSelectedItem(null);
         cboBan.setSelectedItem(null);
         cboTrangThai.setSelectedItem(HoaDonStatus.CREATED);
+        cboTrangThai.setEnabled(false);
         cboKhachHang.requestFocus();
     }
 
@@ -442,8 +448,5 @@ public class HoaDonPanel extends JPanel {
         tblChiTietLichSu.clearSelection();
     }
 }
-
-
-
 
 

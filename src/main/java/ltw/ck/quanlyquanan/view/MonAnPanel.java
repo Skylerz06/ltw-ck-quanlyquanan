@@ -53,15 +53,6 @@ public class MonAnPanel extends JPanel {
         searchPanel.add(btnTimKiem);
         searchPanel.add(btnTaiLai);
 
-        tblMonAn.setRowHeight(24);
-        tblMonAn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tblMonAn.setAutoCreateRowSorter(true);
-
-        JScrollPane scrollPane = new JScrollPane(tblMonAn);
-        JPanel tablePanel = new JPanel(new BorderLayout(0, 10));
-        tablePanel.add(searchPanel, BorderLayout.NORTH);
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
-
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Thông tin món ăn"));
 
@@ -76,26 +67,33 @@ public class MonAnPanel extends JPanel {
         addFormRow(formPanel, gbc, 2, "Đơn giá:", txtDonGia);
         addFormRow(formPanel, gbc, 3, "Loại món:", cboLoaiMonAn);
 
-        JPanel actionPanel = new JPanel(new GridLayout(2, 2, 10, 10));
+        JPanel actionPanel = new JPanel(new GridLayout(4, 1, 10, 10));
         actionPanel.setBorder(BorderFactory.createTitledBorder("Thao tác"));
         actionPanel.add(btnThem);
         actionPanel.add(btnCapNhat);
         actionPanel.add(btnXoa);
         actionPanel.add(btnLamMoi);
 
-        JPanel rightPanel = new JPanel(new BorderLayout(0, 15));
-        rightPanel.add(formPanel, BorderLayout.CENTER);
-        rightPanel.add(actionPanel, BorderLayout.SOUTH);
+        JPanel upperBody = new JPanel(new BorderLayout(15, 0));
+        upperBody.add(formPanel, BorderLayout.CENTER);
+        upperBody.add(actionPanel, BorderLayout.EAST);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tablePanel, rightPanel);
-        splitPane.setResizeWeight(0.62);
-        splitPane.setDividerLocation(640);
+        JPanel upperPanel = new JPanel(new BorderLayout(0, 10));
+        upperPanel.add(searchPanel, BorderLayout.NORTH);
+        upperPanel.add(upperBody, BorderLayout.CENTER);
 
+        tblMonAn.setRowHeight(24);
+        tblMonAn.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tblMonAn.setAutoCreateRowSorter(true);
 
-        JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBorder(BorderFactory.createTitledBorder("Danh sách món ăn"));
+        tablePanel.add(new JScrollPane(tblMonAn), BorderLayout.CENTER);
+
+        JPanel contentPanel = new JPanel(new BorderLayout(0, 12));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
-        contentPanel.add(splitPane, BorderLayout.CENTER);
-
+        contentPanel.add(upperPanel, BorderLayout.NORTH);
+        contentPanel.add(tablePanel, BorderLayout.CENTER);
 
         add(headerPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -202,7 +200,3 @@ public class MonAnPanel extends JPanel {
         txtTenMon.requestFocus();
     }
 }
-
-
-
-

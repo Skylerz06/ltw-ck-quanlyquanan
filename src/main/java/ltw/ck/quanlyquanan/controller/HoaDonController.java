@@ -422,9 +422,25 @@ public class HoaDonController {
 
             hoaDonDAO.save(hoaDon);
             taiDanhSachHoaDon();
-            lamMoiForm();
-            view.showCard(HoaDonPanel.CARD_LICH_SU);
-            chonHoaDonTheoId(hoaDon.getMaHd());
+
+            HoaDon hoaDonDaLuu = hoaDonDAO.findById(hoaDon.getMaHd());
+            if (hoaDonDaLuu == null) {
+                JOptionPane.showMessageDialog(view, "Không thể tải lại hóa đơn vừa tạo.");
+                return;
+            }
+
+            hoaDonDangChon = hoaDonDaLuu;
+            chiTietTam = chuyenChiTietTuEntity(hoaDonDaLuu.getLstChiTietHoaDon());
+            doDuLieuChiTietFormLenBang();
+            view.setMaHoaDon(String.valueOf(hoaDonDaLuu.getMaHd()));
+            view.setNgayLap(formatDateTime(hoaDonDaLuu.getNgayLap()));
+            view.setTrangThai(hoaDonDaLuu.getTrangThai());
+            view.setTrangThaiEditable(true);
+            view.showCard(HoaDonPanel.CARD_LAP_HOA_DON);
+            capNhatTrangThaiNutForm(true);
+            capNhatTrangThaiNutMon(false);
+            view.clearMonAnForm();
+
             JOptionPane.showMessageDialog(view, "Lập hóa đơn thành công.");
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
@@ -457,9 +473,20 @@ public class HoaDonController {
             hoaDon.getLstChiTietHoaDon().addAll(taoDanhSachChiTietEntity(hoaDon));
 
             hoaDonDAO.update(hoaDon);
+            HoaDon hoaDonDaCapNhat = hoaDonDAO.findById(maHd);
             taiDanhSachHoaDon();
-            view.showCard(HoaDonPanel.CARD_LICH_SU);
-            chonHoaDonTheoId(maHd);
+            if (hoaDonDaCapNhat != null) {
+                hoaDonDangChon = hoaDonDaCapNhat;
+                chiTietTam = chuyenChiTietTuEntity(hoaDonDaCapNhat.getLstChiTietHoaDon());
+                doDuLieuChiTietFormLenBang();
+                view.setMaHoaDon(String.valueOf(hoaDonDaCapNhat.getMaHd()));
+                view.setNgayLap(formatDateTime(hoaDonDaCapNhat.getNgayLap()));
+                view.setTrangThai(hoaDonDaCapNhat.getTrangThai());
+            }
+            view.showCard(HoaDonPanel.CARD_LAP_HOA_DON);
+            capNhatTrangThaiNutForm(true);
+            capNhatTrangThaiNutMon(false);
+            view.clearMonAnForm();
             JOptionPane.showMessageDialog(view, "Cập nhật hóa đơn thành công.");
         } catch (ValidationException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
@@ -719,6 +746,7 @@ public class HoaDonController {
     private void capNhatTrangThaiNutForm(boolean dangSuaHoaDon) {
         view.getBtnThemHoaDon().setEnabled(!dangSuaHoaDon);
         view.getBtnCapNhatHoaDon().setEnabled(dangSuaHoaDon);
+        view.setTrangThaiEditable(dangSuaHoaDon);
     }
 
     private void capNhatTrangThaiNutMon(boolean dangChonMon) {
@@ -779,4 +807,11 @@ public class HoaDonController {
         }
     }
 }
+
+
+
+
+
+
+
 

@@ -5,7 +5,7 @@ import ltw.ck.quanlyquanan.view.LoginFrame;
 
 import javax.swing.*;
 
-public class Main {
+public class MainApp {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             LoginFrame loginView = new LoginFrame();
