@@ -48,7 +48,6 @@ public class KhachHangController {
         view.getBtnCapNhat().addActionListener(e -> capNhatKhachHang());
         view.getBtnXoa().addActionListener(e -> xoaKhachHang());
         view.getBtnLamMoi().addActionListener(e -> lamMoiForm());
-        view.getBtnDong().addActionListener(e -> view.dispose());
 
         view.getTxtTimKiem().addActionListener(e -> timKiemKhachHang());
         view.getTblKhachHang().getSelectionModel().addListSelectionListener(this::xuLyChonDong);

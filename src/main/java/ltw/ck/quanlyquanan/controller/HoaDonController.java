@@ -92,7 +92,6 @@ public class HoaDonController {
         view.getBtnThemHoaDon().addActionListener(e -> themHoaDon());
         view.getBtnCapNhatHoaDon().addActionListener(e -> capNhatHoaDon());
         view.getBtnLamMoiForm().addActionListener(e -> lamMoiForm());
-        view.getBtnDong().addActionListener(e -> view.dispose());
 
         view.getBtnThemMon().addActionListener(e -> themMonVaoHoaDon());
         view.getBtnCapNhatMon().addActionListener(e -> capNhatMonTrongHoaDon());

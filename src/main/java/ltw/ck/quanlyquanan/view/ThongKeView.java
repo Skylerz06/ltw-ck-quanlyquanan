@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.Date;
 
-public class ThongKeView extends JFrame {
+public class ThongKeView extends BaseSubView {
 
     public static final String CARD_TONG_QUAN = "tongQuan";
     public static final String CARD_MON_AN = "monAn";
@@ -18,7 +18,6 @@ public class ThongKeView extends JFrame {
 
     private final JButton btnThongKe = new JButton("Thống kê");
     private final JButton btnLamMoi = new JButton("Làm mới");
-    private final JButton btnDong = new JButton("Đóng");
 
     private final JLabel lblTongHoaDon = new JLabel("0", SwingConstants.CENTER);
     private final JLabel lblTongDoanhThu = new JLabel("0 đ", SwingConstants.CENTER);
@@ -48,10 +47,6 @@ public class ThongKeView extends JFrame {
     private final JTable tblMonAn = new JTable(monAnTableModel);
 
     public ThongKeView() {
-        setTitle("Thống kê");
-        setSize(1200, 720);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JSpinner.DateEditor tuNgayEditor = new JSpinner.DateEditor(spnTuNgay, "dd/MM/yyyy");
         spnTuNgay.setEditor(tuNgayEditor);
@@ -69,13 +64,10 @@ public class ThongKeView extends JFrame {
         cardPanel.add(createTongQuanPanel(), CARD_TONG_QUAN);
         cardPanel.add(createMonAnPanel(), CARD_MON_AN);
 
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        footerPanel.add(btnDong);
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
         contentPanel.add(cardPanel, BorderLayout.CENTER);
-        contentPanel.add(footerPanel, BorderLayout.SOUTH);
 
         add(headerPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -189,10 +181,6 @@ public class ThongKeView extends JFrame {
         return btnLamMoi;
     }
 
-    public JButton getBtnDong() {
-        return btnDong;
-    }
-
     public JLabel getLblTongHoaDon() {
         return lblTongHoaDon;
     }
@@ -221,3 +209,6 @@ public class ThongKeView extends JFrame {
         return monAnTableModel;
     }
 }
+
+
+

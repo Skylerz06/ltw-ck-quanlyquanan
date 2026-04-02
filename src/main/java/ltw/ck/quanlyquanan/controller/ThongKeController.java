@@ -52,7 +52,6 @@ public class ThongKeController {
         view.getBtnTabMonAn().addActionListener(e -> view.showCard(ThongKeView.CARD_MON_AN));
         view.getBtnThongKe().addActionListener(e -> thongKe());
         view.getBtnLamMoi().addActionListener(e -> lamMoiBoLoc());
-        view.getBtnDong().addActionListener(e -> view.dispose());
     }
 
     private void thongKe() {

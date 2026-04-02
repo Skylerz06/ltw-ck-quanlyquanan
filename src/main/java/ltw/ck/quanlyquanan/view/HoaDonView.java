@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class HoaDonView extends JFrame {
+public class HoaDonView extends BaseSubView {
 
     public static final String CARD_LAP_HOA_DON = "lapHoaDon";
     public static final String CARD_LICH_SU = "lichSuHoaDon";
@@ -38,7 +38,6 @@ public class HoaDonView extends JFrame {
     private final JButton btnThemHoaDon = new JButton("Thêm hóa đơn");
     private final JButton btnCapNhatHoaDon = new JButton("Cập nhật hóa đơn");
     private final JButton btnLamMoiForm = new JButton("Làm mới");
-    private final JButton btnDong = new JButton("Đóng");
 
     private final JButton btnTimKiem = new JButton("Tìm kiếm");
     private final JButton btnTaiLai = new JButton("Tải lại");
@@ -80,10 +79,6 @@ public class HoaDonView extends JFrame {
     private final JTable tblChiTietLichSu = new JTable(chiTietLichSuTableModel);
 
     public HoaDonView() {
-        setTitle("Lập hóa đơn");
-        setSize(1360, 780);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         txtMaHD.setEditable(false);
         txtNgayLap.setEditable(false);
@@ -99,13 +94,10 @@ public class HoaDonView extends JFrame {
         cardPanel.add(createLapHoaDonPanel(), CARD_LAP_HOA_DON);
         cardPanel.add(createLichSuPanel(), CARD_LICH_SU);
 
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        footerPanel.add(btnDong);
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
         contentPanel.add(cardPanel, BorderLayout.CENTER);
-        contentPanel.add(footerPanel, BorderLayout.SOUTH);
 
         add(headerPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -331,10 +323,6 @@ public class HoaDonView extends JFrame {
         return btnLamMoiForm;
     }
 
-    public JButton getBtnDong() {
-        return btnDong;
-    }
-
     public JButton getBtnTimKiem() {
         return btnTimKiem;
     }
@@ -453,4 +441,7 @@ public class HoaDonView extends JFrame {
         tblChiTietLichSu.clearSelection();
     }
 }
+
+
+
 

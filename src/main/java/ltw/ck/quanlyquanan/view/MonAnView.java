@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class MonAnView extends JFrame {
+public class MonAnView extends BaseSubView {
 
     private final JTextField txtMaMon = new JTextField(20);
     private final JTextField txtTenMon = new JTextField(20);
@@ -35,10 +35,6 @@ public class MonAnView extends JFrame {
     private final JTable tblMonAn = new JTable(tableModel);
 
     public MonAnView() {
-        setTitle("Quản lý món ăn");
-        setSize(1080, 620);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         txtMaMon.setEditable(false);
 
@@ -94,13 +90,11 @@ public class MonAnView extends JFrame {
         splitPane.setResizeWeight(0.62);
         splitPane.setDividerLocation(640);
 
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        footerPanel.add(btnDong);
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
         contentPanel.add(splitPane, BorderLayout.CENTER);
-        contentPanel.add(footerPanel, BorderLayout.SOUTH);
+
 
         add(headerPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -207,3 +201,6 @@ public class MonAnView extends JFrame {
         txtTenMon.requestFocus();
     }
 }
+
+
+

@@ -48,7 +48,6 @@ public class MonAnController {
         view.getBtnCapNhat().addActionListener(e -> capNhatMonAn());
         view.getBtnXoa().addActionListener(e -> xoaMonAn());
         view.getBtnLamMoi().addActionListener(e -> lamMoiForm());
-        view.getBtnDong().addActionListener(e -> view.dispose());
 
         view.getTxtTimKiem().addActionListener(e -> timKiemMonAn());
         view.getTblMonAn().getSelectionModel().addListSelectionListener(this::xuLyChonDong);

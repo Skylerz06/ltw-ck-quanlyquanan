@@ -1,6 +1,7 @@
 package ltw.ck.quanlyquanan.controller;
 
 import ltw.ck.quanlyquanan.services.AppSession;
+import ltw.ck.quanlyquanan.view.BaseSubView;
 import ltw.ck.quanlyquanan.view.HoaDonView;
 import ltw.ck.quanlyquanan.view.KhachHangView;
 import ltw.ck.quanlyquanan.view.LoginView;
@@ -14,6 +15,7 @@ import javax.swing.*;
 public class MainController {
 
     private final MainView view;
+    private BaseSubView currentSubForm;
 
     public MainController(MainView view) {
         this.view = view;
@@ -22,6 +24,7 @@ public class MainController {
 
     private void init() {
         registerEvents();
+        moManHinhHoaDon();
     }
 
     private void registerEvents() {
@@ -68,32 +71,43 @@ public class MainController {
 
     private void moManHinhNhanVien() {
         NhanVienView nhanVienView = new NhanVienView();
-        NhanVienController nhanVienController = new NhanVienController(nhanVienView);
-        nhanVienController.showNhanVienView();
+        new NhanVienController(nhanVienView);
+        hienThiSubForm(nhanVienView);
     }
 
     private void moManHinhMonAn() {
         MonAnView monAnView = new MonAnView();
-        MonAnController monAnController = new MonAnController(monAnView);
-        monAnController.showMonAnView();
+        new MonAnController(monAnView);
+        hienThiSubForm(monAnView);
     }
 
     private void moManHinhKhachHang() {
         KhachHangView khachHangView = new KhachHangView();
-        KhachHangController khachHangController = new KhachHangController(khachHangView);
-        khachHangController.showKhachHangView();
+        new KhachHangController(khachHangView);
+        hienThiSubForm(khachHangView);
     }
 
     private void moManHinhHoaDon() {
         HoaDonView hoaDonView = new HoaDonView();
-        HoaDonController hoaDonController = new HoaDonController(hoaDonView);
-        hoaDonController.showHoaDonView();
+        new HoaDonController(hoaDonView);
+        hienThiSubForm(hoaDonView);
     }
 
     private void moManHinhThongKe() {
         ThongKeView thongKeView = new ThongKeView();
-        ThongKeController thongKeController = new ThongKeController(thongKeView);
-        thongKeController.showThongKeView();
+        new ThongKeController(thongKeView);
+        hienThiSubForm(thongKeView);
+    }
+
+    private void hienThiSubForm(BaseSubView subForm) {
+        currentSubForm = subForm;
+        currentSubForm.setCloseHandler(this::dongSubForm);
+        view.showSubView(subForm);
+    }
+
+    private void dongSubForm() {
+        currentSubForm = null;
+        moManHinhHoaDon();
     }
 
     public void showMainView() {

@@ -45,7 +45,6 @@ public class NhanVienController {
         view.getBtnCapNhat().addActionListener(e -> capNhatNhanVien());
         view.getBtnXoa().addActionListener(e -> xoaNhanVien());
         view.getBtnLamMoi().addActionListener(e -> lamMoiForm());
-        view.getBtnDong().addActionListener(e -> view.dispose());
 
         view.getTxtTimKiem().addActionListener(e -> timKiemNhanVien());
         view.getTblNhanVien().getSelectionModel().addListSelectionListener(this::xuLyChonDong);

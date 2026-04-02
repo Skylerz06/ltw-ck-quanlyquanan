@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class NhanVienView extends JFrame {
+public class NhanVienView extends BaseSubView {
 
     private final JTextField txtMaNV = new JTextField(20);
     private final JTextField txtHoTen = new JTextField(20);
@@ -20,7 +20,6 @@ public class NhanVienView extends JFrame {
     private final JButton btnCapNhat = new JButton("Cập nhật");
     private final JButton btnXoa = new JButton("Xóa");
     private final JButton btnLamMoi = new JButton("Làm mới");
-    private final JButton btnDong = new JButton("Đóng");
 
     private final DefaultTableModel tableModel = new DefaultTableModel(
             new Object[]{"Mã NV", "Họ tên", "SĐT", "Địa chỉ", "Tên đăng nhập"}, 0
@@ -34,10 +33,6 @@ public class NhanVienView extends JFrame {
     private final JTable tblNhanVien = new JTable(tableModel);
 
     public NhanVienView() {
-        setTitle("Quản lý nhân viên");
-        setSize(1100, 650);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         txtMaNV.setEditable(false);
 
@@ -101,13 +96,10 @@ public class NhanVienView extends JFrame {
         splitPane.setResizeWeight(0.62);
         splitPane.setDividerLocation(650);
 
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        footerPanel.add(btnDong);
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
         contentPanel.add(splitPane, BorderLayout.CENTER);
-        contentPanel.add(footerPanel, BorderLayout.SOUTH);
 
         add(headerPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -177,10 +169,6 @@ public class NhanVienView extends JFrame {
         return btnLamMoi;
     }
 
-    public JButton getBtnDong() {
-        return btnDong;
-    }
-
     public JTable getTblNhanVien() {
         return tblNhanVien;
     }
@@ -232,3 +220,5 @@ public class NhanVienView extends JFrame {
         txtHoTen.requestFocus();
     }
 }
+
+

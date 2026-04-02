@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class KhachHangView extends JFrame {
+public class KhachHangView extends BaseSubView {
 
     private final JTextField txtMaKH = new JTextField(20);
     private final JTextField txtTenKH = new JTextField(20);
@@ -20,7 +20,6 @@ public class KhachHangView extends JFrame {
     private final JButton btnCapNhat = new JButton("Cập nhật");
     private final JButton btnXoa = new JButton("Xóa");
     private final JButton btnLamMoi = new JButton("Làm mới");
-    private final JButton btnDong = new JButton("Đóng");
 
     private final DefaultTableModel tableModel = new DefaultTableModel(
             new Object[]{"Mã KH", "Tên khách hàng", "Loại khách hàng"}, 0
@@ -34,11 +33,7 @@ public class KhachHangView extends JFrame {
     private final JTable tblKhachHang = new JTable(tableModel);
 
     public KhachHangView() {
-        setTitle("Quản lý khách hàng");
-        setSize(1050, 620);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+        
         txtMaKH.setEditable(false);
 
         JLabel lblTitle = new JLabel("QUẢN LÝ KHÁCH HÀNG", SwingConstants.CENTER);
@@ -92,13 +87,10 @@ public class KhachHangView extends JFrame {
         splitPane.setResizeWeight(0.62);
         splitPane.setDividerLocation(620);
 
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        footerPanel.add(btnDong);
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
         contentPanel.add(splitPane, BorderLayout.CENTER);
-        contentPanel.add(footerPanel, BorderLayout.SOUTH);
 
         add(headerPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -156,10 +148,6 @@ public class KhachHangView extends JFrame {
         return btnLamMoi;
     }
 
-    public JButton getBtnDong() {
-        return btnDong;
-    }
-
     public JTable getTblKhachHang() {
         return tblKhachHang;
     }
@@ -196,3 +184,5 @@ public class KhachHangView extends JFrame {
         txtTenKH.requestFocus();
     }
 }
+
+
