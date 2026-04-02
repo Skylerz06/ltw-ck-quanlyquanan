@@ -6,7 +6,7 @@ import ltw.ck.quanlyquanan.model.dao.impl.LoaiMonAnDAOImpl;
 import ltw.ck.quanlyquanan.model.dao.impl.MonAnDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.LoaiMonAn;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
-import ltw.ck.quanlyquanan.view.MonAnView;
+import ltw.ck.quanlyquanan.view.MonAnPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -16,18 +16,18 @@ import java.util.Locale;
 
 public class MonAnController {
 
-    private final MonAnView view;
+    private final MonAnPanel view;
     private final MonAnDAO monAnDAO;
     private final LoaiMonAnDAO loaiMonAnDAO;
 
     private List<MonAn> danhSachMonAn = new ArrayList<>();
     private List<LoaiMonAn> danhSachLoaiMonAn = new ArrayList<>();
 
-    public MonAnController(MonAnView view) {
+    public MonAnController(MonAnPanel view) {
         this(view, new MonAnDAOImpl(), new LoaiMonAnDAOImpl());
     }
 
-    public MonAnController(MonAnView view, MonAnDAO monAnDAO, LoaiMonAnDAO loaiMonAnDAO) {
+    public MonAnController(MonAnPanel view, MonAnDAO monAnDAO, LoaiMonAnDAO loaiMonAnDAO) {
         this.view = view;
         this.monAnDAO = monAnDAO;
         this.loaiMonAnDAO = loaiMonAnDAO;

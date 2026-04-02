@@ -3,7 +3,7 @@ package ltw.ck.quanlyquanan.view;
 import javax.swing.*;
 import java.awt.*;
 
-public class LoginView extends JFrame {
+public class LoginFrame extends JFrame {
 
     private final JTextField txtTenDangNhap = new JTextField(20);
     private final JPasswordField txtMatKhau = new JPasswordField(20);
@@ -11,7 +11,7 @@ public class LoginView extends JFrame {
     private final JButton btnDangNhap = new JButton("Đăng nhập");
     private final JButton btnThoat = new JButton("Thoát");
 
-    public LoginView() {
+    public LoginFrame() {
         setTitle("Đăng nhập hệ thống");
         setSize(420, 250);
         setLocationRelativeTo(null);

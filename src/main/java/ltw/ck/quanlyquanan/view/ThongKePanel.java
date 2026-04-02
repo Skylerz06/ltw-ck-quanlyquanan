@@ -5,7 +5,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.Date;
 
-public class ThongKeView extends BaseSubView {
+public class ThongKePanel extends JPanel {
 
     public static final String CARD_TONG_QUAN = "tongQuan";
     public static final String CARD_MON_AN = "monAn";
@@ -46,7 +46,8 @@ public class ThongKeView extends BaseSubView {
     private final JTable tblHoaDon = new JTable(hoaDonTableModel);
     private final JTable tblMonAn = new JTable(monAnTableModel);
 
-    public ThongKeView() {
+    public ThongKePanel() {
+        setLayout(new BorderLayout());
 
         JSpinner.DateEditor tuNgayEditor = new JSpinner.DateEditor(spnTuNgay, "dd/MM/yyyy");
         spnTuNgay.setEditor(tuNgayEditor);
@@ -209,6 +210,7 @@ public class ThongKeView extends BaseSubView {
         return monAnTableModel;
     }
 }
+
 
 
 

@@ -18,7 +18,7 @@ import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.services.AppSession;
-import ltw.ck.quanlyquanan.view.HoaDonView;
+import ltw.ck.quanlyquanan.view.HoaDonPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -37,7 +37,7 @@ public class HoaDonController {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,##0.##");
 
-    private final HoaDonView view;
+    private final HoaDonPanel view;
     private final HoaDonDAO hoaDonDAO;
     private final KhachHangDAO khachHangDAO;
     private final NhanVienDAO nhanVienDAO;
@@ -53,11 +53,11 @@ public class HoaDonController {
     private HoaDon hoaDonDangChon;
     private NhanVien nhanVienDangNhap;
 
-    public HoaDonController(HoaDonView view) {
+    public HoaDonController(HoaDonPanel view) {
         this(view, new HoaDonDAOImpl(), new KhachHangDAOImpl(), new NhanVienDAOImpl(), new BanDAOImpl(), new MonAnDAOImpl());
     }
 
-    public HoaDonController(HoaDonView view,
+    public HoaDonController(HoaDonPanel view,
                             HoaDonDAO hoaDonDAO,
                             KhachHangDAO khachHangDAO,
                             NhanVienDAO nhanVienDAO,
@@ -77,12 +77,12 @@ public class HoaDonController {
         taiDuLieuDanhMuc();
         taiDanhSachHoaDon();
         lamMoiForm();
-        view.showCard(HoaDonView.CARD_LAP_HOA_DON);
+        view.showCard(HoaDonPanel.CARD_LAP_HOA_DON);
     }
 
     private void registerEvents() {
-        view.getBtnTabLapHoaDon().addActionListener(e -> view.showCard(HoaDonView.CARD_LAP_HOA_DON));
-        view.getBtnTabLichSu().addActionListener(e -> view.showCard(HoaDonView.CARD_LICH_SU));
+        view.getBtnTabLapHoaDon().addActionListener(e -> view.showCard(HoaDonPanel.CARD_LAP_HOA_DON));
+        view.getBtnTabLichSu().addActionListener(e -> view.showCard(HoaDonPanel.CARD_LICH_SU));
 
         view.getBtnTimKiem().addActionListener(e -> timKiemHoaDon());
         view.getBtnTaiLai().addActionListener(e -> taiDanhSachHoaDon());
@@ -423,7 +423,7 @@ public class HoaDonController {
             hoaDonDAO.save(hoaDon);
             taiDanhSachHoaDon();
             lamMoiForm();
-            view.showCard(HoaDonView.CARD_LICH_SU);
+            view.showCard(HoaDonPanel.CARD_LICH_SU);
             chonHoaDonTheoId(hoaDon.getMaHd());
             JOptionPane.showMessageDialog(view, "Lập hóa đơn thành công.");
         } catch (ValidationException ex) {
@@ -458,7 +458,7 @@ public class HoaDonController {
 
             hoaDonDAO.update(hoaDon);
             taiDanhSachHoaDon();
-            view.showCard(HoaDonView.CARD_LICH_SU);
+            view.showCard(HoaDonPanel.CARD_LICH_SU);
             chonHoaDonTheoId(maHd);
             JOptionPane.showMessageDialog(view, "Cập nhật hóa đơn thành công.");
         } catch (ValidationException ex) {
@@ -491,7 +491,7 @@ public class HoaDonController {
         view.clearMonAnForm();
         capNhatTrangThaiNutForm(true);
         capNhatTrangThaiNutMon(false);
-        view.showCard(HoaDonView.CARD_LAP_HOA_DON);
+        view.showCard(HoaDonPanel.CARD_LAP_HOA_DON);
     }
 
     private void xoaHoaDon() {

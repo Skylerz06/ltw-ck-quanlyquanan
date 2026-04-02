@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class NhanVienView extends BaseSubView {
+public class NhanVienPanel extends JPanel {
 
     private final JTextField txtMaNV = new JTextField(20);
     private final JTextField txtHoTen = new JTextField(20);
@@ -32,7 +32,8 @@ public class NhanVienView extends BaseSubView {
 
     private final JTable tblNhanVien = new JTable(tableModel);
 
-    public NhanVienView() {
+    public NhanVienPanel() {
+        setLayout(new BorderLayout());
 
         txtMaNV.setEditable(false);
 
@@ -220,5 +221,6 @@ public class NhanVienView extends BaseSubView {
         txtHoTen.requestFocus();
     }
 }
+
 
 

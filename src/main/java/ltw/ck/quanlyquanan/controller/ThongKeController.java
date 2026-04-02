@@ -6,7 +6,7 @@ import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
 import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
-import ltw.ck.quanlyquanan.view.ThongKeView;
+import ltw.ck.quanlyquanan.view.ThongKePanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -28,15 +28,15 @@ public class ThongKeController {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,##0.##");
 
-    private final ThongKeView view;
+    private final ThongKePanel view;
     private final HoaDonDAO hoaDonDAO;
     private List<HoaDon> danhSachHoaDon = new ArrayList<>();
 
-    public ThongKeController(ThongKeView view) {
+    public ThongKeController(ThongKePanel view) {
         this(view, new HoaDonDAOImpl());
     }
 
-    public ThongKeController(ThongKeView view, HoaDonDAO hoaDonDAO) {
+    public ThongKeController(ThongKePanel view, HoaDonDAO hoaDonDAO) {
         this.view = view;
         this.hoaDonDAO = hoaDonDAO;
         init();
@@ -48,8 +48,8 @@ public class ThongKeController {
     }
 
     private void registerEvents() {
-        view.getBtnTabTongQuan().addActionListener(e -> view.showCard(ThongKeView.CARD_TONG_QUAN));
-        view.getBtnTabMonAn().addActionListener(e -> view.showCard(ThongKeView.CARD_MON_AN));
+        view.getBtnTabTongQuan().addActionListener(e -> view.showCard(ThongKePanel.CARD_TONG_QUAN));
+        view.getBtnTabMonAn().addActionListener(e -> view.showCard(ThongKePanel.CARD_MON_AN));
         view.getBtnThongKe().addActionListener(e -> thongKe());
         view.getBtnLamMoi().addActionListener(e -> lamMoiBoLoc());
     }

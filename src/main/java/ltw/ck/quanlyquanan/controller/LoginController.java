@@ -4,17 +4,17 @@ import ltw.ck.quanlyquanan.model.dao.TaiKhoanDAO;
 import ltw.ck.quanlyquanan.model.dao.impl.TaiKhoanDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
 import ltw.ck.quanlyquanan.services.AppSession;
-import ltw.ck.quanlyquanan.view.LoginView;
-import ltw.ck.quanlyquanan.view.MainView;
+import ltw.ck.quanlyquanan.view.LoginFrame;
+import ltw.ck.quanlyquanan.view.MainFrame;
 
 import javax.swing.*;
 
 public class LoginController {
 
-    private final LoginView view;
+    private final LoginFrame view;
     private final TaiKhoanDAO taiKhoanDAO;
 
-    public LoginController(LoginView view) {
+    public LoginController(LoginFrame view) {
         this.view = view;
         this.taiKhoanDAO = new TaiKhoanDAOImpl();
         init();
@@ -66,7 +66,7 @@ public class LoginController {
 
             JOptionPane.showMessageDialog(view, "Đăng nhập thành công!");
 
-            MainView mainView = new MainView();
+            MainFrame mainView = new MainFrame();
             MainController mainController = new MainController(mainView);
             mainView.setWelcomeText("Xin chào, " + tenHienThi);
             mainController.showMainView();

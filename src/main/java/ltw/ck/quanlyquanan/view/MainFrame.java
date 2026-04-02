@@ -3,7 +3,7 @@ package ltw.ck.quanlyquanan.view;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainView extends JFrame {
+public class MainFrame extends JFrame {
 
     private static final String CARD_HOME = "home";
     private static final String CARD_SUB_FORM = "subForm";
@@ -20,10 +20,9 @@ public class MainView extends JFrame {
     private final JButton btnThoat = new JButton("Thoát");
 
     private final JPanel workspaceContent = new JPanel(new CardLayout());
-    private final JPanel homePanel = createHomePanel();
     private JPanel currentSubView;
 
-    public MainView() {
+    public MainFrame() {
         setTitle("Quản lý quán ăn - Main");
         setSize(1440, 860);
         setLocationRelativeTo(null);
@@ -59,7 +58,6 @@ public class MainView extends JFrame {
         navigationWrapper.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 5));
         navigationWrapper.add(navigationPanel, BorderLayout.CENTER);
 
-        workspaceContent.add(homePanel, CARD_HOME);
 
         JPanel workspacePanel = new JPanel(new BorderLayout());
         workspacePanel.setBorder(BorderFactory.createTitledBorder("Khu vực làm việc"));
@@ -81,19 +79,6 @@ public class MainView extends JFrame {
         showHomeCard();
     }
 
-    private JPanel createHomePanel() {
-        JLabel lblHomeTitle = new JLabel("Chọn một chức năng ở bên trái để bắt đầu", SwingConstants.CENTER);
-        lblHomeTitle.setFont(new Font("Arial", Font.BOLD, 26));
-
-        JLabel lblHomeSubTitle = new JLabel("Các màn hình nghiệp vụ sẽ hiển thị trực tiếp bên trong form chính.", SwingConstants.CENTER);
-        lblHomeSubTitle.setFont(new Font("Arial", Font.PLAIN, 16));
-
-        JPanel panel = new JPanel(new GridLayout(2, 1, 0, 12));
-        panel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
-        panel.add(lblHomeTitle);
-        panel.add(lblHomeSubTitle);
-        return panel;
-    }
 
     public void showSubView(JPanel subView) {
         if (currentSubView != null) {

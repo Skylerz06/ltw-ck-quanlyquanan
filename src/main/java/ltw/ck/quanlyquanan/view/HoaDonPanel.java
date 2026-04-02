@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class HoaDonView extends BaseSubView {
+public class HoaDonPanel extends JPanel {
 
     public static final String CARD_LAP_HOA_DON = "lapHoaDon";
     public static final String CARD_LICH_SU = "lichSuHoaDon";
@@ -78,7 +78,8 @@ public class HoaDonView extends BaseSubView {
     private final JTable tblHoaDon = new JTable(hoaDonTableModel);
     private final JTable tblChiTietLichSu = new JTable(chiTietLichSuTableModel);
 
-    public HoaDonView() {
+    public HoaDonPanel() {
+        setLayout(new BorderLayout());
 
         txtMaHD.setEditable(false);
         txtNgayLap.setEditable(false);
@@ -441,6 +442,7 @@ public class HoaDonView extends BaseSubView {
         tblChiTietLichSu.clearSelection();
     }
 }
+
 
 
 

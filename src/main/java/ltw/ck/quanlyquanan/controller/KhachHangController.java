@@ -6,7 +6,7 @@ import ltw.ck.quanlyquanan.model.dao.impl.KhachHangDAOImpl;
 import ltw.ck.quanlyquanan.model.dao.impl.LoaiKhachHangDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.LoaiKH;
-import ltw.ck.quanlyquanan.view.KhachHangView;
+import ltw.ck.quanlyquanan.view.KhachHangPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -16,18 +16,18 @@ import java.util.Locale;
 
 public class KhachHangController {
 
-    private final KhachHangView view;
+    private final KhachHangPanel view;
     private final KhachHangDAO khachHangDAO;
     private final LoaiKhachHangDAO loaiKhachHangDAO;
 
     private List<KhachHang> danhSachKhachHang = new ArrayList<>();
     private List<LoaiKH> danhSachLoaiKH = new ArrayList<>();
 
-    public KhachHangController(KhachHangView view) {
+    public KhachHangController(KhachHangPanel view) {
         this(view, new KhachHangDAOImpl(), new LoaiKhachHangDAOImpl());
     }
 
-    public KhachHangController(KhachHangView view, KhachHangDAO khachHangDAO, LoaiKhachHangDAO loaiKhachHangDAO) {
+    public KhachHangController(KhachHangPanel view, KhachHangDAO khachHangDAO, LoaiKhachHangDAO loaiKhachHangDAO) {
         this.view = view;
         this.khachHangDAO = khachHangDAO;
         this.loaiKhachHangDAO = loaiKhachHangDAO;

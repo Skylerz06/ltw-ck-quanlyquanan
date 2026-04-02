@@ -1,23 +1,22 @@
 package ltw.ck.quanlyquanan.controller;
 
 import ltw.ck.quanlyquanan.services.AppSession;
-import ltw.ck.quanlyquanan.view.BaseSubView;
-import ltw.ck.quanlyquanan.view.HoaDonView;
-import ltw.ck.quanlyquanan.view.KhachHangView;
-import ltw.ck.quanlyquanan.view.LoginView;
-import ltw.ck.quanlyquanan.view.MainView;
-import ltw.ck.quanlyquanan.view.MonAnView;
-import ltw.ck.quanlyquanan.view.NhanVienView;
-import ltw.ck.quanlyquanan.view.ThongKeView;
+import ltw.ck.quanlyquanan.view.HoaDonPanel;
+import ltw.ck.quanlyquanan.view.KhachHangPanel;
+import ltw.ck.quanlyquanan.view.LoginFrame;
+import ltw.ck.quanlyquanan.view.MainFrame;
+import ltw.ck.quanlyquanan.view.MonAnPanel;
+import ltw.ck.quanlyquanan.view.NhanVienPanel;
+import ltw.ck.quanlyquanan.view.ThongKePanel;
 
 import javax.swing.*;
 
 public class MainController {
 
-    private final MainView view;
-    private BaseSubView currentSubForm;
+    private final MainFrame view;
+    private JPanel currentSubForm;
 
-    public MainController(MainView view) {
+    public MainController(MainFrame view) {
         this.view = view;
         init();
     }
@@ -50,7 +49,7 @@ public class MainController {
             AppSession.clear();
             view.dispose();
 
-            LoginView loginView = new LoginView();
+            LoginFrame loginView = new LoginFrame();
             LoginController loginController = new LoginController(loginView);
             loginController.showLoginView();
         }
@@ -70,44 +69,38 @@ public class MainController {
     }
 
     private void moManHinhNhanVien() {
-        NhanVienView nhanVienView = new NhanVienView();
+        NhanVienPanel nhanVienView = new NhanVienPanel();
         new NhanVienController(nhanVienView);
         hienThiSubForm(nhanVienView);
     }
 
     private void moManHinhMonAn() {
-        MonAnView monAnView = new MonAnView();
+        MonAnPanel monAnView = new MonAnPanel();
         new MonAnController(monAnView);
         hienThiSubForm(monAnView);
     }
 
     private void moManHinhKhachHang() {
-        KhachHangView khachHangView = new KhachHangView();
+        KhachHangPanel khachHangView = new KhachHangPanel();
         new KhachHangController(khachHangView);
         hienThiSubForm(khachHangView);
     }
 
     private void moManHinhHoaDon() {
-        HoaDonView hoaDonView = new HoaDonView();
+        HoaDonPanel hoaDonView = new HoaDonPanel();
         new HoaDonController(hoaDonView);
         hienThiSubForm(hoaDonView);
     }
 
     private void moManHinhThongKe() {
-        ThongKeView thongKeView = new ThongKeView();
+        ThongKePanel thongKeView = new ThongKePanel();
         new ThongKeController(thongKeView);
         hienThiSubForm(thongKeView);
     }
 
-    private void hienThiSubForm(BaseSubView subForm) {
+    private void hienThiSubForm(JPanel subForm) {
         currentSubForm = subForm;
-        currentSubForm.setCloseHandler(this::dongSubForm);
         view.showSubView(subForm);
-    }
-
-    private void dongSubForm() {
-        currentSubForm = null;
-        moManHinhHoaDon();
     }
 
     public void showMainView() {

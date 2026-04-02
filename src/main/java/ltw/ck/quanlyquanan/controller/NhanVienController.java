@@ -6,7 +6,7 @@ import ltw.ck.quanlyquanan.model.dao.impl.NhanVienDAOImpl;
 import ltw.ck.quanlyquanan.model.dao.impl.TaiKhoanDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
-import ltw.ck.quanlyquanan.view.NhanVienView;
+import ltw.ck.quanlyquanan.view.NhanVienPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -16,16 +16,16 @@ import java.util.Locale;
 
 public class NhanVienController {
 
-    private final NhanVienView view;
+    private final NhanVienPanel view;
     private final NhanVienDAO nhanVienDAO;
     private final TaiKhoanDAO taiKhoanDAO;
     private List<NhanVien> danhSachNhanVien = new ArrayList<>();
 
-    public NhanVienController(NhanVienView view) {
+    public NhanVienController(NhanVienPanel view) {
         this(view, new NhanVienDAOImpl(), new TaiKhoanDAOImpl());
     }
 
-    public NhanVienController(NhanVienView view, NhanVienDAO nhanVienDAO, TaiKhoanDAO taiKhoanDAO) {
+    public NhanVienController(NhanVienPanel view, NhanVienDAO nhanVienDAO, TaiKhoanDAO taiKhoanDAO) {
         this.view = view;
         this.nhanVienDAO = nhanVienDAO;
         this.taiKhoanDAO = taiKhoanDAO;
