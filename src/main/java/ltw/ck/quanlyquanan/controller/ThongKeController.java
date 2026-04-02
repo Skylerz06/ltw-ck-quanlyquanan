@@ -1,44 +1,38 @@
 package ltw.ck.quanlyquanan.controller;
 
-import ltw.ck.quanlyquanan.model.dao.HoaDonDAO;
-import ltw.ck.quanlyquanan.model.dao.impl.HoaDonDAOImpl;
 import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
 import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
+import ltw.ck.quanlyquanan.services.ServiceException;
+import ltw.ck.quanlyquanan.services.ThongKeResult;
+import ltw.ck.quanlyquanan.services.ThongKeService;
+import ltw.ck.quanlyquanan.services.impl.ThongKeServiceImpl;
 import ltw.ck.quanlyquanan.view.ThongKePanel;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.text.DecimalFormat;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ThongKeController {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DecimalFormat MONEY_FORMAT = new DecimalFormat("#,##0.##");
 
     private final ThongKePanel view;
-    private final HoaDonDAO hoaDonDAO;
-    private List<HoaDon> danhSachHoaDon = new ArrayList<>();
+    private final ThongKeService thongKeService;
 
     public ThongKeController(ThongKePanel view) {
-        this(view, new HoaDonDAOImpl());
+        this(view, new ThongKeServiceImpl());
     }
 
-    public ThongKeController(ThongKePanel view, HoaDonDAO hoaDonDAO) {
+    public ThongKeController(ThongKePanel view, ThongKeService thongKeService) {
         this.view = view;
-        this.hoaDonDAO = hoaDonDAO;
+        this.thongKeService = thongKeService;
         init();
     }
 
@@ -56,70 +50,23 @@ public class ThongKeController {
 
     private void thongKe() {
         try {
-            DateRange range = layKhoangNgay();
-            danhSachHoaDon = new ArrayList<>(hoaDonDAO.findByKhoangNgay(range.from(), range.to()));
+            ThongKeResult result = thongKeService.thongKe(
+                    (java.util.Date) view.getSpnTuNgay().getValue(),
+                    (java.util.Date) view.getSpnDenNgay().getValue()
+            );
 
-            HoaDonStatsDto hoaDonStats = tinhThongKeHoaDon(danhSachHoaDon);
-            List<MonAnStatsDto> monAnStats = tinhThongKeMonAn(danhSachHoaDon);
-
-            hienThiThongKeHoaDon(hoaDonStats, danhSachHoaDon);
-            hienThiThongKeMonAn(monAnStats);
-        } catch (ValidationException ex) {
-            JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
+            hienThiThongKeHoaDon(result.hoaDonStats(), result.danhSachHoaDon());
+            hienThiThongKeMonAn(result.monAnStats());
+        } catch (ServiceException ex) {
+            JOptionPane.showMessageDialog(
+                    view,
+                    ex.getMessage(),
+                    "Dữ liệu chưa hợp lệ",
+                    JOptionPane.WARNING_MESSAGE
+            );
         } catch (Exception ex) {
             hienThiLoi("Không thể thống kê dữ liệu", ex);
         }
-    }
-
-    private DateRange layKhoangNgay() {
-        LocalDate tuNgay = chuyenDate((Date) view.getSpnTuNgay().getValue());
-        LocalDate denNgay = chuyenDate((Date) view.getSpnDenNgay().getValue());
-
-        if (tuNgay.isAfter(denNgay)) {
-            throw new ValidationException("Từ ngày không được lớn hơn đến ngày.");
-        }
-
-        return new DateRange(tuNgay.atStartOfDay(), denNgay.atTime(23, 59, 59));
-    }
-
-    private HoaDonStatsDto tinhThongKeHoaDon(List<HoaDon> dsHoaDon) {
-        long tongHoaDon = dsHoaDon.size();
-        double tongDoanhThu = 0;
-        LocalDate homNay = LocalDate.now();
-        long hoaDonHomNay = 0;
-
-        for (HoaDon hoaDon : dsHoaDon) {
-            tongDoanhThu += tinhTongTienHoaDon(hoaDon);
-            if (hoaDon.getNgayLap() != null && hoaDon.getNgayLap().toLocalDate().equals(homNay)) {
-                hoaDonHomNay++;
-            }
-        }
-
-        return new HoaDonStatsDto(tongHoaDon, tongDoanhThu, hoaDonHomNay);
-    }
-
-    private List<MonAnStatsDto> tinhThongKeMonAn(List<HoaDon> dsHoaDon) {
-        Map<String, Long> thongKeMonAn = new HashMap<>();
-
-        for (HoaDon hoaDon : dsHoaDon) {
-            for (ChiTietHD chiTietHD : hoaDon.getLstChiTietHoaDon()) {
-                if (chiTietHD.getMonAn() == null || chiTietHD.getSoLuong() == null) {
-                    continue;
-                }
-                String tenMon = chiTietHD.getMonAn().getTenMon();
-                long soLuong = chiTietHD.getSoLuong();
-                thongKeMonAn.merge(tenMon, soLuong, Long::sum);
-            }
-        }
-
-        List<MonAnStatsDto> result = new ArrayList<>();
-        for (Map.Entry<String, Long> entry : thongKeMonAn.entrySet()) {
-            result.add(new MonAnStatsDto(entry.getKey(), entry.getValue()));
-        }
-
-        result.sort(Comparator.comparingLong(MonAnStatsDto::getSoLuongBan).reversed()
-                .thenComparing(MonAnStatsDto::getTenMon));
-        return result;
     }
 
     private void hienThiThongKeHoaDon(HoaDonStatsDto stats, List<HoaDon> dsHoaDon) {
@@ -173,17 +120,13 @@ public class ThongKeController {
     private double tinhTongTienHoaDon(HoaDon hoaDon) {
         double tong = 0;
         for (ChiTietHD chiTietHD : hoaDon.getLstChiTietHoaDon()) {
-            if (chiTietHD.getMonAn() != null && chiTietHD.getMonAn().getDonGia() != null && chiTietHD.getSoLuong() != null) {
+            if (chiTietHD.getMonAn() != null
+                    && chiTietHD.getMonAn().getDonGia() != null
+                    && chiTietHD.getSoLuong() != null) {
                 tong += chiTietHD.getMonAn().getDonGia() * chiTietHD.getSoLuong();
             }
         }
         return tong;
-    }
-
-    private LocalDate chuyenDate(Date date) {
-        return Instant.ofEpochMilli(date.getTime())
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
     }
 
     private String formatDateTime(LocalDateTime dateTime) {
@@ -191,19 +134,15 @@ public class ThongKeController {
     }
 
     private void hienThiLoi(String message, Exception ex) {
-        JOptionPane.showMessageDialog(view, message + ": " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(
+                view,
+                message + ": " + ex.getMessage(),
+                "Lỗi",
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 
     public void showThongKeView() {
         view.setVisible(true);
-    }
-
-    private record DateRange(LocalDateTime from, LocalDateTime to) {
-    }
-
-    private static class ValidationException extends RuntimeException {
-        private ValidationException(String message) {
-            super(message);
-        }
     }
 }

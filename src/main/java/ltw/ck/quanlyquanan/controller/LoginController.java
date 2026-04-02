@@ -1,9 +1,10 @@
 package ltw.ck.quanlyquanan.controller;
 
-import ltw.ck.quanlyquanan.model.dao.TaiKhoanDAO;
-import ltw.ck.quanlyquanan.model.dao.impl.TaiKhoanDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
 import ltw.ck.quanlyquanan.services.AppSession;
+import ltw.ck.quanlyquanan.services.LoginService;
+import ltw.ck.quanlyquanan.services.ServiceException;
+import ltw.ck.quanlyquanan.services.impl.LoginServiceImpl;
 import ltw.ck.quanlyquanan.view.LoginFrame;
 import ltw.ck.quanlyquanan.view.MainFrame;
 
@@ -12,11 +13,15 @@ import javax.swing.*;
 public class LoginController {
 
     private final LoginFrame view;
-    private final TaiKhoanDAO taiKhoanDAO;
+    private final LoginService loginService;
 
     public LoginController(LoginFrame view) {
+        this(view, new LoginServiceImpl());
+    }
+
+    public LoginController(LoginFrame view, LoginService loginService) {
         this.view = view;
-        this.taiKhoanDAO = new TaiKhoanDAOImpl();
+        this.loginService = loginService;
         init();
     }
 
@@ -33,30 +38,11 @@ public class LoginController {
     }
 
     private void dangNhap() {
-        String tenDangNhap = view.getTenDangNhap();
-        String matKhau = view.getMatKhau();
-
-        if (tenDangNhap.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Vui lòng nhập tên đăng nhập.");
-            view.getTxtTenDangNhap().requestFocus();
-            return;
-        }
-
-        if (matKhau.isEmpty()) {
-            JOptionPane.showMessageDialog(view, "Vui lòng nhập mật khẩu.");
-            view.getTxtMatKhau().requestFocus();
-            return;
-        }
-
         try {
-            TaiKhoan taiKhoan = taiKhoanDAO.checkLogin(tenDangNhap, matKhau);
-
-            if (taiKhoan == null) {
-                JOptionPane.showMessageDialog(view, "Sai tên đăng nhập hoặc mật khẩu.");
-                view.getTxtMatKhau().setText("");
-                view.getTxtMatKhau().requestFocus();
-                return;
-            }
+            TaiKhoan taiKhoan = loginService.login(
+                    view.getTenDangNhap(),
+                    view.getMatKhau()
+            );
 
             AppSession.setCurrentTaiKhoan(taiKhoan);
 
@@ -73,6 +59,15 @@ public class LoginController {
 
             view.dispose();
 
+        } catch (ServiceException ex) {
+            JOptionPane.showMessageDialog(view, ex.getMessage());
+
+            if ("Vui lòng nhập tên đăng nhập.".equals(ex.getMessage())) {
+                view.getTxtTenDangNhap().requestFocus();
+            } else {
+                view.getTxtMatKhau().setText("");
+                view.getTxtMatKhau().requestFocus();
+            }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
                     view,

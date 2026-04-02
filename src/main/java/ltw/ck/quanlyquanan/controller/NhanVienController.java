@@ -1,34 +1,30 @@
 package ltw.ck.quanlyquanan.controller;
 
-import ltw.ck.quanlyquanan.model.dao.NhanVienDAO;
-import ltw.ck.quanlyquanan.model.dao.TaiKhoanDAO;
-import ltw.ck.quanlyquanan.model.dao.impl.NhanVienDAOImpl;
-import ltw.ck.quanlyquanan.model.dao.impl.TaiKhoanDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
+import ltw.ck.quanlyquanan.services.NhanVienService;
+import ltw.ck.quanlyquanan.services.ServiceException;
+import ltw.ck.quanlyquanan.services.impl.NhanVienServiceImpl;
 import ltw.ck.quanlyquanan.view.NhanVienPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class NhanVienController {
 
     private final NhanVienPanel view;
-    private final NhanVienDAO nhanVienDAO;
-    private final TaiKhoanDAO taiKhoanDAO;
+    private final NhanVienService nhanVienService;
     private List<NhanVien> danhSachNhanVien = new ArrayList<>();
 
     public NhanVienController(NhanVienPanel view) {
-        this(view, new NhanVienDAOImpl(), new TaiKhoanDAOImpl());
+        this(view, new NhanVienServiceImpl());
     }
 
-    public NhanVienController(NhanVienPanel view, NhanVienDAO nhanVienDAO, TaiKhoanDAO taiKhoanDAO) {
+    public NhanVienController(NhanVienPanel view, NhanVienService nhanVienService) {
         this.view = view;
-        this.nhanVienDAO = nhanVienDAO;
-        this.taiKhoanDAO = taiKhoanDAO;
+        this.nhanVienService = nhanVienService;
         init();
     }
 
@@ -50,39 +46,9 @@ public class NhanVienController {
         view.getTblNhanVien().getSelectionModel().addListSelectionListener(this::xuLyChonDong);
     }
 
-    private void xuLyChonDong(ListSelectionEvent event) {
-        if (event.getValueIsAdjusting()) {
-            return;
-        }
-
-        int selectedRow = view.getTblNhanVien().getSelectedRow();
-        if (selectedRow < 0) {
-            capNhatTrangThaiNut(false);
-            return;
-        }
-
-        int modelRow = view.getTblNhanVien().convertRowIndexToModel(selectedRow);
-        Long maNV = (Long) view.getTableModel().getValueAt(modelRow, 0);
-        NhanVien nhanVien = timNhanVienTrongDanhSach(maNV);
-        if (nhanVien == null) {
-            return;
-        }
-
-        TaiKhoan taiKhoan = nhanVien.getTaiKhoan();
-        view.setFormData(
-                String.valueOf(nhanVien.getMaNV()),
-                nhanVien.getHoTen(),
-                nhanVien.getSdt(),
-                nhanVien.getDiaChi() == null ? "" : nhanVien.getDiaChi(),
-                taiKhoan == null ? "" : taiKhoan.getTenDangNhap(),
-                taiKhoan == null ? "" : taiKhoan.getMatKhau()
-        );
-        capNhatTrangThaiNut(true);
-    }
-
     private void taiDanhSachNhanVien() {
         try {
-            danhSachNhanVien = new ArrayList<>(nhanVienDAO.findAll());
+            danhSachNhanVien = new ArrayList<>(nhanVienService.findAll());
             doDuLieuLenBang(danhSachNhanVien);
             lamMoiForm();
         } catch (Exception ex) {
@@ -91,37 +57,12 @@ public class NhanVienController {
     }
 
     private void timKiemNhanVien() {
-        String tuKhoa = view.getTuKhoaTimKiem();
-
-        if (tuKhoa.isEmpty()) {
-            taiDanhSachNhanVien();
-            return;
-        }
-
         try {
-            List<NhanVien> tatCaNhanVien = nhanVienDAO.findAll();
-            String normalizedKeyword = tuKhoa.toLowerCase(Locale.ROOT);
-            List<NhanVien> ketQua = new ArrayList<>();
-
-            for (NhanVien nhanVien : tatCaNhanVien) {
-                String hoTen = safeLower(nhanVien.getHoTen());
-                String sdt = safeLower(nhanVien.getSdt());
-                String tenDangNhap = nhanVien.getTaiKhoan() == null
-                        ? ""
-                        : safeLower(nhanVien.getTaiKhoan().getTenDangNhap());
-
-                if (hoTen.contains(normalizedKeyword)
-                        || sdt.contains(normalizedKeyword)
-                        || tenDangNhap.contains(normalizedKeyword)) {
-                    ketQua.add(nhanVien);
-                }
-            }
-
-            danhSachNhanVien = ketQua;
-            doDuLieuLenBang(ketQua);
+            danhSachNhanVien = new ArrayList<>(nhanVienService.search(view.getTuKhoaTimKiem()));
+            doDuLieuLenBang(danhSachNhanVien);
             lamMoiForm();
 
-            if (ketQua.isEmpty()) {
+            if (danhSachNhanVien.isEmpty()) {
                 JOptionPane.showMessageDialog(view, "Không tìm thấy nhân viên phù hợp.");
             }
         } catch (Exception ex) {
@@ -129,47 +70,20 @@ public class NhanVienController {
         }
     }
 
-    private void doDuLieuLenBang(List<NhanVien> dsNhanVien) {
-        var tableModel = view.getTableModel();
-        tableModel.setRowCount(0);
-
-        for (NhanVien nhanVien : dsNhanVien) {
-            String tenDangNhap = nhanVien.getTaiKhoan() == null
-                    ? ""
-                    : nhanVien.getTaiKhoan().getTenDangNhap();
-
-            tableModel.addRow(new Object[]{
-                    nhanVien.getMaNV(),
-                    nhanVien.getHoTen(),
-                    nhanVien.getSdt(),
-                    nhanVien.getDiaChi() == null ? "" : nhanVien.getDiaChi(),
-                    tenDangNhap
-            });
-        }
-    }
-
     private void themNhanVien() {
         try {
-            FormData formData = layVaKiemTraDuLieu(false, null, null);
+            NhanVien nhanVien = nhanVienService.create(
+                    view.getHoTen(),
+                    view.getSdt(),
+                    view.getDiaChi(),
+                    view.getTenDangNhap(),
+                    view.getMatKhau()
+            );
 
-            NhanVien nhanVien = new NhanVien();
-            nhanVien.setHoTen(formData.hoTen());
-            nhanVien.setSdt(formData.sdt());
-            nhanVien.setDiaChi(formData.diaChi());
-
-            if (formData.tenDangNhap() != null) {
-                TaiKhoan taiKhoan = new TaiKhoan();
-                taiKhoan.setTenDangNhap(formData.tenDangNhap());
-                taiKhoan.setMatKhau(formData.matKhau());
-                taiKhoan.setNhanVien(nhanVien);
-                nhanVien.setTaiKhoan(taiKhoan);
-            }
-
-            nhanVienDAO.save(nhanVien);
             taiDanhSachNhanVien();
             chonNhanVienTheoId(nhanVien.getMaNV());
             JOptionPane.showMessageDialog(view, "Thêm nhân viên thành công.");
-        } catch (ValidationException ex) {
+        } catch (ServiceException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể thêm nhân viên", ex);
@@ -184,40 +98,19 @@ public class NhanVienController {
         }
 
         try {
-            NhanVien nhanVien = nhanVienDAO.findById(maNV);
-            if (nhanVien == null) {
-                JOptionPane.showMessageDialog(view, "Không tìm thấy nhân viên cần cập nhật.");
-                taiDanhSachNhanVien();
-                return;
-            }
+            nhanVienService.update(
+                    maNV,
+                    view.getHoTen(),
+                    view.getSdt(),
+                    view.getDiaChi(),
+                    view.getTenDangNhap(),
+                    view.getMatKhau()
+            );
 
-            TaiKhoan taiKhoanHienTai = nhanVien.getTaiKhoan();
-            FormData formData = layVaKiemTraDuLieu(true, nhanVien, taiKhoanHienTai);
-
-            nhanVien.setHoTen(formData.hoTen());
-            nhanVien.setSdt(formData.sdt());
-            nhanVien.setDiaChi(formData.diaChi());
-
-            if (formData.tenDangNhap() == null) {
-                nhanVien.setTaiKhoan(null);
-            } else if (taiKhoanHienTai == null) {
-                TaiKhoan taiKhoanMoi = new TaiKhoan();
-                taiKhoanMoi.setTenDangNhap(formData.tenDangNhap());
-                taiKhoanMoi.setMatKhau(formData.matKhau());
-                taiKhoanMoi.setNhanVien(nhanVien);
-                nhanVien.setTaiKhoan(taiKhoanMoi);
-            } else {
-                taiKhoanHienTai.setTenDangNhap(formData.tenDangNhap());
-                taiKhoanHienTai.setMatKhau(formData.matKhau());
-                taiKhoanHienTai.setNhanVien(nhanVien);
-                nhanVien.setTaiKhoan(taiKhoanHienTai);
-            }
-
-            nhanVienDAO.update(nhanVien);
             taiDanhSachNhanVien();
             chonNhanVienTheoId(maNV);
             JOptionPane.showMessageDialog(view, "Cập nhật nhân viên thành công.");
-        } catch (ValidationException ex) {
+        } catch (ServiceException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể cập nhật nhân viên", ex);
@@ -243,11 +136,56 @@ public class NhanVienController {
         }
 
         try {
-            nhanVienDAO.delete(maNV);
+            nhanVienService.delete(maNV);
             taiDanhSachNhanVien();
             JOptionPane.showMessageDialog(view, "Xóa nhân viên thành công.");
         } catch (Exception ex) {
             hienThiLoi("Không thể xóa nhân viên. Nhân viên này có thể đang được tham chiếu bởi dữ liệu khác", ex);
+        }
+    }
+
+    private void xuLyChonDong(ListSelectionEvent event) {
+        if (event.getValueIsAdjusting()) return;
+
+        int selectedRow = view.getTblNhanVien().getSelectedRow();
+        if (selectedRow < 0) {
+            capNhatTrangThaiNut(false);
+            return;
+        }
+
+        int modelRow = view.getTblNhanVien().convertRowIndexToModel(selectedRow);
+        Long maNV = (Long) view.getTableModel().getValueAt(modelRow, 0);
+        NhanVien nhanVien = timNhanVienTrongDanhSach(maNV);
+        if (nhanVien == null) return;
+
+        TaiKhoan taiKhoan = nhanVien.getTaiKhoan();
+        view.setFormData(
+                String.valueOf(nhanVien.getMaNV()),
+                nhanVien.getHoTen(),
+                nhanVien.getSdt(),
+                nhanVien.getDiaChi() == null ? "" : nhanVien.getDiaChi(),
+                taiKhoan == null ? "" : taiKhoan.getTenDangNhap(),
+                taiKhoan == null ? "" : taiKhoan.getMatKhau()
+        );
+        capNhatTrangThaiNut(true);
+    }
+
+    private void doDuLieuLenBang(List<NhanVien> dsNhanVien) {
+        var tableModel = view.getTableModel();
+        tableModel.setRowCount(0);
+
+        for (NhanVien nhanVien : dsNhanVien) {
+            String tenDangNhap = nhanVien.getTaiKhoan() == null
+                    ? ""
+                    : nhanVien.getTaiKhoan().getTenDangNhap();
+
+            tableModel.addRow(new Object[]{
+                    nhanVien.getMaNV(),
+                    nhanVien.getHoTen(),
+                    nhanVien.getSdt(),
+                    nhanVien.getDiaChi() == null ? "" : nhanVien.getDiaChi(),
+                    tenDangNhap
+            });
         }
     }
 
@@ -256,78 +194,16 @@ public class NhanVienController {
         capNhatTrangThaiNut(false);
     }
 
-    private FormData layVaKiemTraDuLieu(boolean isUpdate, NhanVien nhanVienHienTai, TaiKhoan taiKhoanHienTai) {
-        String hoTen = view.getHoTen();
-        String sdt = view.getSdt();
-        String diaChi = view.getDiaChi();
-        String tenDangNhap = view.getTenDangNhap();
-        String matKhau = view.getMatKhau();
-
-        if (hoTen.isEmpty()) {
-            throw new ValidationException("Vui lòng nhập họ tên nhân viên.");
-        }
-
-        if (sdt.isEmpty()) {
-            throw new ValidationException("Vui lòng nhập số điện thoại.");
-        }
-
-        if (!sdt.matches("\\d{9,15}")) {
-            throw new ValidationException("Số điện thoại chỉ được chứa 9 đến 15 chữ số.");
-        }
-
-        NhanVien nhanVienTheoSdt = nhanVienDAO.findBySdt(sdt);
-        if (nhanVienTheoSdt != null) {
-            boolean isSameNhanVien = isUpdate && nhanVienHienTai != null
-                    && nhanVienTheoSdt.getMaNV().equals(nhanVienHienTai.getMaNV());
-            if (!isSameNhanVien) {
-                throw new ValidationException("Số điện thoại đã tồn tại.");
-            }
-        }
-
-        boolean coNhapTenDangNhap = !tenDangNhap.isEmpty();
-        boolean coNhapMatKhau = !matKhau.isEmpty();
-
-        if (coNhapTenDangNhap != coNhapMatKhau) {
-            throw new ValidationException("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
-        }
-
-        if (taiKhoanHienTai != null && !coNhapTenDangNhap) {
-            throw new ValidationException("Nhân viên này đang có tài khoản. Vui lòng nhập đầy đủ để cập nhật.");
-        }
-
-        if (!coNhapTenDangNhap) {
-            return new FormData(hoTen, sdt, diaChi, null, null);
-        }
-
-        TaiKhoan taiKhoanTheoTenDangNhap = taiKhoanDAO.findByTenDangNhap(tenDangNhap);
-        if (taiKhoanTheoTenDangNhap != null) {
-            boolean isSameTaiKhoan = isUpdate && taiKhoanHienTai != null
-                    && taiKhoanTheoTenDangNhap.getMaTK().equals(taiKhoanHienTai.getMaTK());
-            if (!isSameTaiKhoan) {
-                throw new ValidationException("Tên đăng nhập đã tồn tại.");
-            }
-        }
-
-        return new FormData(hoTen, sdt, diaChi, tenDangNhap, matKhau);
-    }
-
     private Long layMaNhanVienDangChon() {
-        String maNhanVien = view.getMaNhanVien();
-        if (maNhanVien.isEmpty()) {
-            return null;
-        }
-
         try {
-            return Long.parseLong(maNhanVien);
+            return view.getMaNhanVien().isEmpty() ? null : Long.parseLong(view.getMaNhanVien());
         } catch (NumberFormatException ex) {
             return null;
         }
     }
 
     private void chonNhanVienTheoId(Long maNV) {
-        if (maNV == null) {
-            return;
-        }
+        if (maNV == null) return;
 
         for (int modelRow = 0; modelRow < view.getTableModel().getRowCount(); modelRow++) {
             Long value = (Long) view.getTableModel().getValueAt(modelRow, 0);
@@ -342,9 +218,7 @@ public class NhanVienController {
 
     private NhanVien timNhanVienTrongDanhSach(Long maNV) {
         for (NhanVien nhanVien : danhSachNhanVien) {
-            if (nhanVien.getMaNV().equals(maNV)) {
-                return nhanVien;
-            }
+            if (nhanVien.getMaNV().equals(maNV)) return nhanVien;
         }
         return null;
     }
@@ -355,10 +229,6 @@ public class NhanVienController {
         view.getBtnXoa().setEnabled(dangChonNhanVien);
     }
 
-    private String safeLower(String value) {
-        return value == null ? "" : value.toLowerCase(Locale.ROOT);
-    }
-
     private void hienThiLoi(String message, Exception ex) {
         JOptionPane.showMessageDialog(
                 view,
@@ -366,18 +236,5 @@ public class NhanVienController {
                 "Lỗi",
                 JOptionPane.ERROR_MESSAGE
         );
-    }
-
-    public void showNhanVienView() {
-        view.setVisible(true);
-    }
-
-    private record FormData(String hoTen, String sdt, String diaChi, String tenDangNhap, String matKhau) {
-    }
-
-    private static class ValidationException extends RuntimeException {
-        private ValidationException(String message) {
-            super(message);
-        }
     }
 }

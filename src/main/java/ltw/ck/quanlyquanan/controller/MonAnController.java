@@ -1,36 +1,32 @@
 package ltw.ck.quanlyquanan.controller;
 
-import ltw.ck.quanlyquanan.model.dao.LoaiMonAnDAO;
-import ltw.ck.quanlyquanan.model.dao.MonAnDAO;
-import ltw.ck.quanlyquanan.model.dao.impl.LoaiMonAnDAOImpl;
-import ltw.ck.quanlyquanan.model.dao.impl.MonAnDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.LoaiMonAn;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
+import ltw.ck.quanlyquanan.services.MonAnService;
+import ltw.ck.quanlyquanan.services.ServiceException;
+import ltw.ck.quanlyquanan.services.impl.MonAnServiceImpl;
 import ltw.ck.quanlyquanan.view.MonAnPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class MonAnController {
 
     private final MonAnPanel view;
-    private final MonAnDAO monAnDAO;
-    private final LoaiMonAnDAO loaiMonAnDAO;
+    private final MonAnService monAnService;
 
     private List<MonAn> danhSachMonAn = new ArrayList<>();
     private List<LoaiMonAn> danhSachLoaiMonAn = new ArrayList<>();
 
     public MonAnController(MonAnPanel view) {
-        this(view, new MonAnDAOImpl(), new LoaiMonAnDAOImpl());
+        this(view, new MonAnServiceImpl());
     }
 
-    public MonAnController(MonAnPanel view, MonAnDAO monAnDAO, LoaiMonAnDAO loaiMonAnDAO) {
+    public MonAnController(MonAnPanel view, MonAnService monAnService) {
         this.view = view;
-        this.monAnDAO = monAnDAO;
-        this.loaiMonAnDAO = loaiMonAnDAO;
+        this.monAnService = monAnService;
         init();
     }
 
@@ -55,7 +51,7 @@ public class MonAnController {
 
     private void taiLoaiMonAn() {
         try {
-            danhSachLoaiMonAn = new ArrayList<>(loaiMonAnDAO.findAll());
+            danhSachLoaiMonAn = new ArrayList<>(monAnService.findAllLoaiMonAn());
             DefaultComboBoxModel<LoaiMonAn> comboBoxModel = new DefaultComboBoxModel<>();
             for (LoaiMonAn loaiMonAn : danhSachLoaiMonAn) {
                 comboBoxModel.addElement(loaiMonAn);
@@ -96,7 +92,7 @@ public class MonAnController {
 
     private void taiDanhSachMonAn() {
         try {
-            danhSachMonAn = new ArrayList<>(monAnDAO.findAll());
+            danhSachMonAn = new ArrayList<>(monAnService.findAll());
             doDuLieuLenBang(danhSachMonAn);
             lamMoiForm();
         } catch (Exception ex) {
@@ -105,35 +101,12 @@ public class MonAnController {
     }
 
     private void timKiemMonAn() {
-        String tuKhoa = view.getTuKhoaTimKiem();
-
-        if (tuKhoa.isEmpty()) {
-            taiDanhSachMonAn();
-            return;
-        }
-
         try {
-            List<MonAn> tatCaMonAn = monAnDAO.findAll();
-            String normalizedKeyword = tuKhoa.toLowerCase(Locale.ROOT);
-            List<MonAn> ketQua = new ArrayList<>();
-
-            for (MonAn monAn : tatCaMonAn) {
-                String tenMon = safeLower(monAn.getTenMon());
-                String donGia = monAn.getDonGia() == null ? "" : String.valueOf(monAn.getDonGia());
-                String tenLoai = monAn.getLoaiMonAn() == null ? "" : safeLower(monAn.getLoaiMonAn().getTenLoai());
-
-                if (tenMon.contains(normalizedKeyword)
-                        || donGia.contains(normalizedKeyword)
-                        || tenLoai.contains(normalizedKeyword)) {
-                    ketQua.add(monAn);
-                }
-            }
-
-            danhSachMonAn = ketQua;
-            doDuLieuLenBang(ketQua);
+            danhSachMonAn = new ArrayList<>(monAnService.search(view.getTuKhoaTimKiem()));
+            doDuLieuLenBang(danhSachMonAn);
             lamMoiForm();
 
-            if (ketQua.isEmpty()) {
+            if (danhSachMonAn.isEmpty()) {
                 JOptionPane.showMessageDialog(view, "Không tìm thấy món ăn phù hợp.");
             }
         } catch (Exception ex) {
@@ -159,18 +132,16 @@ public class MonAnController {
 
     private void themMonAn() {
         try {
-            FormData formData = layVaKiemTraDuLieu(false, null);
+            MonAn monAn = monAnService.create(
+                    view.getTenMonAn(),
+                    view.getDonGia(),
+                    view.getLoaiMonAnDangChon()
+            );
 
-            MonAn monAn = new MonAn();
-            monAn.setTenMon(formData.tenMon());
-            monAn.setDonGia(formData.donGia());
-            monAn.setLoaiMonAn(formData.loaiMonAn());
-
-            monAnDAO.save(monAn);
             taiDanhSachMonAn();
             chonMonAnTheoId(monAn.getMaMon());
             JOptionPane.showMessageDialog(view, "Thêm món ăn thành công.");
-        } catch (ValidationException ex) {
+        } catch (ServiceException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể thêm món ăn", ex);
@@ -185,24 +156,17 @@ public class MonAnController {
         }
 
         try {
-            MonAn monAn = monAnDAO.findById(maMon);
-            if (monAn == null) {
-                JOptionPane.showMessageDialog(view, "Không tìm thấy món ăn cần cập nhật.");
-                taiDanhSachMonAn();
-                return;
-            }
+            monAnService.update(
+                    maMon,
+                    view.getTenMonAn(),
+                    view.getDonGia(),
+                    view.getLoaiMonAnDangChon()
+            );
 
-            FormData formData = layVaKiemTraDuLieu(true, monAn);
-
-            monAn.setTenMon(formData.tenMon());
-            monAn.setDonGia(formData.donGia());
-            monAn.setLoaiMonAn(formData.loaiMonAn());
-
-            monAnDAO.update(monAn);
             taiDanhSachMonAn();
             chonMonAnTheoId(maMon);
             JOptionPane.showMessageDialog(view, "Cập nhật món ăn thành công.");
-        } catch (ValidationException ex) {
+        } catch (ServiceException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể cập nhật món ăn", ex);
@@ -228,9 +192,11 @@ public class MonAnController {
         }
 
         try {
-            monAnDAO.delete(maMon);
+            monAnService.delete(maMon);
             taiDanhSachMonAn();
             JOptionPane.showMessageDialog(view, "Xóa món ăn thành công.");
+        } catch (ServiceException ex) {
+            JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể xóa món ăn. Món ăn này có thể đang được tham chiếu bởi dữ liệu khác", ex);
         }
@@ -239,48 +205,6 @@ public class MonAnController {
     private void lamMoiForm() {
         view.clearForm();
         capNhatTrangThaiNut(false);
-    }
-
-    private FormData layVaKiemTraDuLieu(boolean isUpdate, MonAn monAnHienTai) {
-        String tenMon = view.getTenMonAn();
-        String donGiaText = view.getDonGia();
-        LoaiMonAn loaiMonAn = view.getLoaiMonAnDangChon();
-
-        if (tenMon.isEmpty()) {
-            throw new ValidationException("Vui lòng nhập tên món ăn.");
-        }
-
-        if (donGiaText.isEmpty()) {
-            throw new ValidationException("Vui lòng nhập đơn giá.");
-        }
-
-        Double donGia;
-        try {
-            donGia = Double.parseDouble(donGiaText);
-        } catch (NumberFormatException ex) {
-            throw new ValidationException("Đơn giá phải là số hợp lệ.");
-        }
-
-        if (donGia <= 0) {
-            throw new ValidationException("Đơn giá phải lớn hơn 0.");
-        }
-
-        if (loaiMonAn == null) {
-            throw new ValidationException("Vui lòng chọn loại món ăn.");
-        }
-
-        List<MonAn> monAnCungTen = monAnDAO.findByTenMon(tenMon);
-        for (MonAn item : monAnCungTen) {
-            boolean isSameMonAn = isUpdate
-                    && monAnHienTai != null
-                    && item.getMaMon().equals(monAnHienTai.getMaMon());
-
-            if (!isSameMonAn && item.getTenMon().equalsIgnoreCase(tenMon)) {
-                throw new ValidationException("Tên món ăn đã tồn tại.");
-            }
-        }
-
-        return new FormData(tenMon, donGia, loaiMonAn);
     }
 
     private Long layMaMonAnDangChon() {
@@ -327,10 +251,6 @@ public class MonAnController {
         view.getBtnXoa().setEnabled(dangChonMonAn);
     }
 
-    private String safeLower(String value) {
-        return value == null ? "" : value.toLowerCase(Locale.ROOT);
-    }
-
     private void hienThiLoi(String message, Exception ex) {
         JOptionPane.showMessageDialog(
                 view,
@@ -342,14 +262,5 @@ public class MonAnController {
 
     public void showMonAnView() {
         view.setVisible(true);
-    }
-
-    private record FormData(String tenMon, Double donGia, LoaiMonAn loaiMonAn) {
-    }
-
-    private static class ValidationException extends RuntimeException {
-        private ValidationException(String message) {
-            super(message);
-        }
     }
 }

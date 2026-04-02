@@ -1,36 +1,32 @@
 package ltw.ck.quanlyquanan.controller;
 
-import ltw.ck.quanlyquanan.model.dao.KhachHangDAO;
-import ltw.ck.quanlyquanan.model.dao.LoaiKhachHangDAO;
-import ltw.ck.quanlyquanan.model.dao.impl.KhachHangDAOImpl;
-import ltw.ck.quanlyquanan.model.dao.impl.LoaiKhachHangDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.LoaiKH;
+import ltw.ck.quanlyquanan.services.KhachHangService;
+import ltw.ck.quanlyquanan.services.ServiceException;
+import ltw.ck.quanlyquanan.services.impl.KhachHangServiceImpl;
 import ltw.ck.quanlyquanan.view.KhachHangPanel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class KhachHangController {
 
     private final KhachHangPanel view;
-    private final KhachHangDAO khachHangDAO;
-    private final LoaiKhachHangDAO loaiKhachHangDAO;
+    private final KhachHangService khachHangService;
 
     private List<KhachHang> danhSachKhachHang = new ArrayList<>();
     private List<LoaiKH> danhSachLoaiKH = new ArrayList<>();
 
     public KhachHangController(KhachHangPanel view) {
-        this(view, new KhachHangDAOImpl(), new LoaiKhachHangDAOImpl());
+        this(view, new KhachHangServiceImpl());
     }
 
-    public KhachHangController(KhachHangPanel view, KhachHangDAO khachHangDAO, LoaiKhachHangDAO loaiKhachHangDAO) {
+    public KhachHangController(KhachHangPanel view, KhachHangService khachHangService) {
         this.view = view;
-        this.khachHangDAO = khachHangDAO;
-        this.loaiKhachHangDAO = loaiKhachHangDAO;
+        this.khachHangService = khachHangService;
         init();
     }
 
@@ -55,7 +51,7 @@ public class KhachHangController {
 
     private void taiLoaiKhachHang() {
         try {
-            danhSachLoaiKH = new ArrayList<>(loaiKhachHangDAO.findAll());
+            danhSachLoaiKH = new ArrayList<>(khachHangService.findAllLoaiKH());
             DefaultComboBoxModel<LoaiKH> comboBoxModel = new DefaultComboBoxModel<>();
             for (LoaiKH loaiKH : danhSachLoaiKH) {
                 comboBoxModel.addElement(loaiKH);
@@ -95,7 +91,7 @@ public class KhachHangController {
 
     private void taiDanhSachKhachHang() {
         try {
-            danhSachKhachHang = new ArrayList<>(khachHangDAO.findAll());
+            danhSachKhachHang = new ArrayList<>(khachHangService.findAll());
             doDuLieuLenBang(danhSachKhachHang);
             lamMoiForm();
         } catch (Exception ex) {
@@ -104,34 +100,12 @@ public class KhachHangController {
     }
 
     private void timKiemKhachHang() {
-        String tuKhoa = view.getTuKhoaTimKiem();
-
-        if (tuKhoa.isEmpty()) {
-            taiDanhSachKhachHang();
-            return;
-        }
-
         try {
-            List<KhachHang> tatCaKhachHang = khachHangDAO.findAll();
-            String normalizedKeyword = tuKhoa.toLowerCase(Locale.ROOT);
-            List<KhachHang> ketQua = new ArrayList<>();
-
-            for (KhachHang khachHang : tatCaKhachHang) {
-                String tenKH = safeLower(khachHang.getTenKh());
-                String tenLoai = khachHang.getLoaiKhachHang() == null
-                        ? ""
-                        : safeLower(khachHang.getLoaiKhachHang().getTenLoaiKh());
-
-                if (tenKH.contains(normalizedKeyword) || tenLoai.contains(normalizedKeyword)) {
-                    ketQua.add(khachHang);
-                }
-            }
-
-            danhSachKhachHang = ketQua;
-            doDuLieuLenBang(ketQua);
+            danhSachKhachHang = new ArrayList<>(khachHangService.search(view.getTuKhoaTimKiem()));
+            doDuLieuLenBang(danhSachKhachHang);
             lamMoiForm();
 
-            if (ketQua.isEmpty()) {
+            if (danhSachKhachHang.isEmpty()) {
                 JOptionPane.showMessageDialog(view, "Không tìm thấy khách hàng phù hợp.");
             }
         } catch (Exception ex) {
@@ -158,17 +132,15 @@ public class KhachHangController {
 
     private void themKhachHang() {
         try {
-            FormData formData = layVaKiemTraDuLieu(false, null);
+            KhachHang khachHang = khachHangService.create(
+                    view.getTenKhachHang(),
+                    view.getLoaiKhachHangDangChon()
+            );
 
-            KhachHang khachHang = new KhachHang();
-            khachHang.setTenKh(formData.tenKH());
-            khachHang.setLoaiKhachHang(formData.loaiKH());
-
-            khachHangDAO.save(khachHang);
             taiDanhSachKhachHang();
             chonKhachHangTheoId(khachHang.getMaKh());
             JOptionPane.showMessageDialog(view, "Thêm khách hàng thành công.");
-        } catch (ValidationException ex) {
+        } catch (ServiceException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể thêm khách hàng", ex);
@@ -183,23 +155,16 @@ public class KhachHangController {
         }
 
         try {
-            KhachHang khachHang = khachHangDAO.findById(maKH);
-            if (khachHang == null) {
-                JOptionPane.showMessageDialog(view, "Không tìm thấy khách hàng cần cập nhật.");
-                taiDanhSachKhachHang();
-                return;
-            }
+            khachHangService.update(
+                    maKH,
+                    view.getTenKhachHang(),
+                    view.getLoaiKhachHangDangChon()
+            );
 
-            FormData formData = layVaKiemTraDuLieu(true, khachHang);
-
-            khachHang.setTenKh(formData.tenKH());
-            khachHang.setLoaiKhachHang(formData.loaiKH());
-
-            khachHangDAO.update(khachHang);
             taiDanhSachKhachHang();
             chonKhachHangTheoId(maKH);
             JOptionPane.showMessageDialog(view, "Cập nhật khách hàng thành công.");
-        } catch (ValidationException ex) {
+        } catch (ServiceException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể cập nhật khách hàng", ex);
@@ -225,9 +190,11 @@ public class KhachHangController {
         }
 
         try {
-            khachHangDAO.delete(maKH);
+            khachHangService.delete(maKH);
             taiDanhSachKhachHang();
             JOptionPane.showMessageDialog(view, "Xóa khách hàng thành công.");
+        } catch (ServiceException ex) {
+            JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể xóa khách hàng. Khách hàng này có thể đang được tham chiếu bởi dữ liệu khác", ex);
         }
@@ -236,32 +203,6 @@ public class KhachHangController {
     private void lamMoiForm() {
         view.clearForm();
         capNhatTrangThaiNut(false);
-    }
-
-    private FormData layVaKiemTraDuLieu(boolean isUpdate, KhachHang khachHangHienTai) {
-        String tenKH = view.getTenKhachHang();
-        LoaiKH loaiKH = view.getLoaiKhachHangDangChon();
-
-        if (tenKH.isEmpty()) {
-            throw new ValidationException("Vui lòng nhập tên khách hàng.");
-        }
-
-        if (loaiKH == null) {
-            throw new ValidationException("Vui lòng chọn loại khách hàng.");
-        }
-
-        List<KhachHang> khachHangCungTen = khachHangDAO.findByTenKh(tenKH);
-        for (KhachHang item : khachHangCungTen) {
-            boolean isSameKhachHang = isUpdate
-                    && khachHangHienTai != null
-                    && item.getMaKh().equals(khachHangHienTai.getMaKh());
-
-            if (!isSameKhachHang && item.getTenKh().equalsIgnoreCase(tenKH)) {
-                throw new ValidationException("Tên khách hàng đã tồn tại.");
-            }
-        }
-
-        return new FormData(tenKH, loaiKH);
     }
 
     private Long layMaKhachHangDangChon() {
@@ -308,10 +249,6 @@ public class KhachHangController {
         view.getBtnXoa().setEnabled(dangChonKhachHang);
     }
 
-    private String safeLower(String value) {
-        return value == null ? "" : value.toLowerCase(Locale.ROOT);
-    }
-
     private void hienThiLoi(String message, Exception ex) {
         JOptionPane.showMessageDialog(
                 view,
@@ -323,14 +260,5 @@ public class KhachHangController {
 
     public void showKhachHangView() {
         view.setVisible(true);
-    }
-
-    private record FormData(String tenKH, LoaiKH loaiKH) {
-    }
-
-    private static class ValidationException extends RuntimeException {
-        private ValidationException(String message) {
-            super(message);
-        }
     }
 }
