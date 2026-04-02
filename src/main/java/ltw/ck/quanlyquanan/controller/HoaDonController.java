@@ -13,6 +13,7 @@ import ltw.ck.quanlyquanan.model.dao.impl.NhanVienDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.Ban;
 import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
+import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
@@ -191,12 +192,14 @@ public class HoaDonController {
             for (HoaDon hoaDon : tatCaHoaDon) {
                 String maHd = String.valueOf(hoaDon.getMaHd());
                 String ngayLap = hoaDon.getNgayLap() == null ? "" : formatDateTime(hoaDon.getNgayLap()).toLowerCase(Locale.ROOT);
+                String trangThai = hoaDon.getTrangThai() == null ? "" : hoaDon.getTrangThai().name().toLowerCase(Locale.ROOT);
                 String tenKh = hoaDon.getKhachHang() == null ? "khách lẻ" : safeLower(hoaDon.getKhachHang().getTenKh());
                 String tenNv = hoaDon.getNhanVien() == null ? "" : safeLower(hoaDon.getNhanVien().getHoTen());
                 String tenBan = hoaDon.getBan() == null ? "" : safeLower(hoaDon.getBan().getTenBan());
 
                 if (maHd.contains(normalizedKeyword)
                         || ngayLap.contains(normalizedKeyword)
+                        || trangThai.contains(normalizedKeyword)
                         || tenKh.contains(normalizedKeyword)
                         || tenNv.contains(normalizedKeyword)
                         || tenBan.contains(normalizedKeyword)) {
@@ -226,6 +229,7 @@ public class HoaDonController {
             tableModel.addRow(new Object[]{
                     hoaDon.getMaHd(),
                     formatDateTime(hoaDon.getNgayLap()),
+                    hoaDon.getTrangThai() == null ? "" : hoaDon.getTrangThai().name(),
                     hoaDon.getKhachHang() == null ? "Khách lẻ" : hoaDon.getKhachHang().getTenKh(),
                     hoaDon.getNhanVien() == null ? "" : hoaDon.getNhanVien().getHoTen(),
                     hoaDon.getBan() == null ? "" : hoaDon.getBan().getTenBan(),
@@ -411,6 +415,7 @@ public class HoaDonController {
 
             HoaDon hoaDon = new HoaDon();
             hoaDon.setNgayLap(LocalDateTime.now());
+            hoaDon.setTrangThai(HoaDonStatus.CREATED);
             hoaDon.setKhachHang(formData.khachHang());
             hoaDon.setNhanVien(formData.nhanVien());
             hoaDon.setBan(formData.ban());
@@ -445,6 +450,7 @@ public class HoaDonController {
             }
 
             HeaderFormData formData = layVaKiemTraThongTinHoaDon();
+            hoaDon.setTrangThai(formData.trangThai());
             hoaDon.setKhachHang(formData.khachHang());
             hoaDon.setNhanVien(formData.nhanVien());
             hoaDon.setBan(formData.ban());
@@ -473,6 +479,7 @@ public class HoaDonController {
         doDuLieuChiTietFormLenBang();
         view.setMaHoaDon(String.valueOf(hoaDonDangChon.getMaHd()));
         view.setNgayLap(formatDateTime(hoaDonDangChon.getNgayLap()));
+        view.setTrangThai(hoaDonDangChon.getTrangThai());
         selectComboItemById(view.getCboKhachHang(),
                 hoaDonDangChon.getKhachHang() == null ? null : hoaDonDangChon.getKhachHang().getMaKh(),
                 KhachHang::getMaKh);
@@ -522,6 +529,7 @@ public class HoaDonController {
         NhanVien nhanVien = nhanVienDangNhap != null ? nhanVienDangNhap : view.getNhanVienDangChon();
         Ban ban = view.getBanDangChon();
         KhachHang khachHang = view.getKhachHangDangChon();
+        HoaDonStatus trangThai = view.getTrangThaiDangChon();
 
         if (nhanVien == null) {
             throw new ValidationException("Không xác định được nhân viên đang đăng nhập.");
@@ -529,11 +537,14 @@ public class HoaDonController {
         if (ban == null) {
             throw new ValidationException("Vui lòng chọn bàn.");
         }
+        if (trangThai == null) {
+            throw new ValidationException("Vui lòng chọn trạng thái hóa đơn.");
+        }
         if (chiTietTam.isEmpty()) {
             throw new ValidationException("Vui lòng thêm ít nhất một món ăn vào hóa đơn.");
         }
 
-        return new HeaderFormData(khachHang, nhanVien, ban);
+        return new HeaderFormData(khachHang, nhanVien, ban, trangThai);
     }
 
     private int parseSoLuong(String soLuongText) {
@@ -584,6 +595,7 @@ public class HoaDonController {
         view.clearHoaDonForm();
         doDuLieuChiTietFormLenBang();
         view.setNgayLap(formatDateTime(LocalDateTime.now()));
+        view.setTrangThai(HoaDonStatus.CREATED);
         if (nhanVienDangNhap != null && view.getCboNhanVien().getItemCount() > 0) {
             view.getCboNhanVien().setSelectedIndex(0);
         }
@@ -741,7 +753,7 @@ public class HoaDonController {
         view.setVisible(true);
     }
 
-    private record HeaderFormData(KhachHang khachHang, NhanVien nhanVien, Ban ban) {
+    private record HeaderFormData(KhachHang khachHang, NhanVien nhanVien, Ban ban, HoaDonStatus trangThai) {
     }
 
     private record ChiTietHoaDonItem(MonAn monAn, int soLuong) {
@@ -768,3 +780,4 @@ public class HoaDonController {
         }
     }
 }
+

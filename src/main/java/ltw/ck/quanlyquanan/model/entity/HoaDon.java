@@ -1,8 +1,11 @@
 package ltw.ck.quanlyquanan.model.entity;
+
 import jakarta.persistence.*;
-import java.util.List;
-import java.util.ArrayList;
+import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "hoa_don")
@@ -15,6 +18,10 @@ public class HoaDon {
 
     @Column(name = "ngay_lap", nullable = false)
     private LocalDateTime ngayLap;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "trang_thai", nullable = false, length = 100)
+    private HoaDonStatus trangThai = HoaDonStatus.CREATED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ma_kh",
@@ -42,6 +49,9 @@ public class HoaDon {
         if (this.ngayLap == null) {
             this.ngayLap = LocalDateTime.now();
         }
+        if (this.trangThai == null) {
+            this.trangThai = HoaDonStatus.CREATED;
+        }
     }
 
     public Long getMaHd() {
@@ -58,6 +68,14 @@ public class HoaDon {
 
     public void setNgayLap(LocalDateTime ngayLap) {
         this.ngayLap = ngayLap;
+    }
+
+    public HoaDonStatus getTrangThai() {
+        return trangThai;
+    }
+
+    public void setTrangThai(HoaDonStatus trangThai) {
+        this.trangThai = trangThai;
     }
 
     public KhachHang getKhachHang() {

@@ -154,6 +154,7 @@ public class HoaDonDAOImpl implements HoaDonDAO {
                     .setParameter("id", hoaDon.getMaHd())
                     .getSingleResult();
 
+            managedHoaDon.setTrangThai(hoaDon.getTrangThai());
             managedHoaDon.setKhachHang(hoaDon.getKhachHang() == null ? null : em.getReference(hoaDon.getKhachHang().getClass(), hoaDon.getKhachHang().getMaKh()));
             managedHoaDon.setNhanVien(em.getReference(hoaDon.getNhanVien().getClass(), hoaDon.getNhanVien().getMaNV()));
             managedHoaDon.setBan(em.getReference(hoaDon.getBan().getClass(), hoaDon.getBan().getMaBan()));
