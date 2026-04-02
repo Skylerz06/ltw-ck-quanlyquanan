@@ -1,6 +1,7 @@
 package ltw.ck.quanlyquanan.view;
 
 import ltw.ck.quanlyquanan.model.entity.Ban;
+import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
@@ -28,6 +29,7 @@ public class HoaDonView extends JFrame {
     private final JComboBox<NhanVien> cboNhanVien = new JComboBox<>();
     private final JComboBox<Ban> cboBan = new JComboBox<>();
     private final JComboBox<MonAn> cboMonAn = new JComboBox<>();
+    private final JComboBox<HoaDonStatus> cboTrangThai = new JComboBox<>(HoaDonStatus.values());
 
     private final JButton btnThemMon = new JButton("Thêm món");
     private final JButton btnCapNhatMon = new JButton("Cập nhật món");
@@ -56,7 +58,7 @@ public class HoaDonView extends JFrame {
     };
 
     private final DefaultTableModel hoaDonTableModel = new DefaultTableModel(
-            new Object[]{"Mã HD", "Ngày lập", "Khách hàng", "Nhân viên", "Bàn", "Số món", "Tổng tiền"}, 0
+            new Object[]{"Mã HD", "Ngày lập", "Trạng thái", "Khách hàng", "Nhân viên", "Bàn", "Số món", "Tổng tiền"}, 0
     ) {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -126,13 +128,14 @@ public class HoaDonView extends JFrame {
         GridBagConstraints gbc = createGbc();
         addFormRow(hoaDonInfoPanel, gbc, 0, "Mã hóa đơn:", txtMaHD);
         addFormRow(hoaDonInfoPanel, gbc, 1, "Ngày lập:", txtNgayLap);
-        addFormRow(hoaDonInfoPanel, gbc, 2, "Khách hàng:", cboKhachHang);
-        addFormRow(hoaDonInfoPanel, gbc, 3, "Nhân viên:", cboNhanVien);
-        addFormRow(hoaDonInfoPanel, gbc, 4, "Bàn:", cboBan);
+        addFormRow(hoaDonInfoPanel, gbc, 2, "Trạng thái:", cboTrangThai);
+        addFormRow(hoaDonInfoPanel, gbc, 3, "Khách hàng:", cboKhachHang);
+        addFormRow(hoaDonInfoPanel, gbc, 4, "Nhân viên:", cboNhanVien);
+        addFormRow(hoaDonInfoPanel, gbc, 5, "Bàn:", cboBan);
 
         JLabel lblKhachLe = new JLabel("<html><i>Có thể bỏ trống khách hàng cho hóa đơn khách lẻ.</i></html>");
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         hoaDonInfoPanel.add(lblKhachLe, gbc);
 
@@ -300,6 +303,10 @@ public class HoaDonView extends JFrame {
         return cboMonAn;
     }
 
+    public JComboBox<HoaDonStatus> getCboTrangThai() {
+        return cboTrangThai;
+    }
+
     public JButton getBtnThemMon() {
         return btnThemMon;
     }
@@ -416,6 +423,14 @@ public class HoaDonView extends JFrame {
         return (MonAn) cboMonAn.getSelectedItem();
     }
 
+    public HoaDonStatus getTrangThaiDangChon() {
+        return (HoaDonStatus) cboTrangThai.getSelectedItem();
+    }
+
+    public void setTrangThai(HoaDonStatus trangThai) {
+        cboTrangThai.setSelectedItem(trangThai);
+    }
+
     public void clearHoaDonForm() {
         txtMaHD.setText("");
         txtNgayLap.setText("");
@@ -423,6 +438,7 @@ public class HoaDonView extends JFrame {
         txtSoLuong.setText("1");
         cboKhachHang.setSelectedItem(null);
         cboBan.setSelectedItem(null);
+        cboTrangThai.setSelectedItem(HoaDonStatus.CREATED);
         cboKhachHang.requestFocus();
     }
 
@@ -437,3 +453,4 @@ public class HoaDonView extends JFrame {
         tblChiTietLichSu.clearSelection();
     }
 }
+
