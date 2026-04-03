@@ -107,8 +107,10 @@ public class KhachHangDAOImpl implements KhachHangDAO {
             tx.commit();
         } catch (Exception e){
             if (tx.isActive()) tx.rollback();
+            throw e;
         } finally {
             em.close();
         }
     }
 }
+

@@ -1,7 +1,6 @@
 package ltw.ck.quanlyquanan.controller;
 
 import ltw.ck.quanlyquanan.model.dto.ChiTietHDDto;
-
 import ltw.ck.quanlyquanan.model.entity.Ban;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
@@ -102,6 +101,7 @@ public class HoaDonController {
         }
         view.getCboKhachHang().setModel(model);
         view.getCboKhachHang().setSelectedItem(null);
+        view.setTenKhachHangNhap("");
         view.getCboKhachHang().setRenderer(new NullableObjectRenderer("Khách lẻ"));
     }
 
@@ -345,9 +345,13 @@ public class HoaDonController {
     private void themHoaDon() {
         try {
             NhanVien nhanVien = nhanVienDangNhap != null ? nhanVienDangNhap : view.getNhanVienDangChon();
+            KhachHang khachHang = hoaDonService.resolveKhachHang(
+                    view.getKhachHangDangChon(),
+                    view.getTenKhachHangNhap()
+            );
 
             HoaDon hoaDon = hoaDonService.create(
-                    view.getKhachHangDangChon(),
+                    khachHang,
                     nhanVien,
                     view.getBanDangChon(),
                     view.getTrangThaiDangChon(),
@@ -355,6 +359,7 @@ public class HoaDonController {
             );
 
             HoaDon hoaDonDaLuu = hoaDonService.findById(hoaDon.getMaHd());
+            taiDuLieuDanhMuc();
             taiDanhSachHoaDon();
             apHoaDonLenForm(hoaDonDaLuu);
 
@@ -380,16 +385,21 @@ public class HoaDonController {
 
         try {
             NhanVien nhanVien = nhanVienDangNhap != null ? nhanVienDangNhap : view.getNhanVienDangChon();
+            KhachHang khachHang = hoaDonService.resolveKhachHang(
+                    view.getKhachHangDangChon(),
+                    view.getTenKhachHangNhap()
+            );
 
             HoaDon hoaDonDaCapNhat = hoaDonService.update(
                     maHd,
-                    view.getKhachHangDangChon(),
+                    khachHang,
                     nhanVien,
                     view.getBanDangChon(),
                     view.getTrangThaiDangChon(),
                     chiTietTam
             );
 
+            taiDuLieuDanhMuc();
             taiDanhSachHoaDon();
             apHoaDonLenForm(hoaDonDaCapNhat);
 
@@ -471,6 +481,9 @@ public class HoaDonController {
         view.setTrangThaiEditable(true);
 
         selectComboItemById(view.getCboKhachHang(), formData.maKhachHang(), KhachHang::getMaKh);
+        if (hoaDon.getKhachHang() == null) {
+            view.setTenKhachHangNhap("");
+        }
         selectComboItemById(view.getCboBan(), formData.maBan(), Ban::getMaBan);
 
         if (nhanVienDangNhap != null) {
@@ -485,6 +498,7 @@ public class HoaDonController {
         doDuLieuChiTietFormLenBang();
         view.setNgayLap(formatDateTime(LocalDateTime.now()));
         view.setTrangThai(HoaDonStatus.CREATED);
+        view.setTenKhachHangNhap("");
 
         if (nhanVienDangNhap != null && view.getCboNhanVien().getItemCount() > 0) {
             view.getCboNhanVien().setSelectedIndex(0);
@@ -514,6 +528,9 @@ public class HoaDonController {
     private <T, ID> void selectComboItemById(JComboBox<T> comboBox, ID id, Function<T, ID> idExtractor) {
         if (id == null) {
             comboBox.setSelectedItem(null);
+            if (comboBox.isEditable()) {
+                comboBox.getEditor().setItem("");
+            }
             return;
         }
 
@@ -527,6 +544,9 @@ public class HoaDonController {
         }
 
         comboBox.setSelectedItem(null);
+        if (comboBox.isEditable()) {
+            comboBox.getEditor().setItem("");
+        }
     }
 
     private HoaDon timHoaDonTrongDanhSach(Long maHd) {
@@ -609,6 +629,3 @@ public class HoaDonController {
         }
     }
 }
-
-
-

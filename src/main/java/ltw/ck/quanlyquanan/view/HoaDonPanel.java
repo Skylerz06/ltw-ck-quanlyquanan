@@ -83,6 +83,7 @@ public class HoaDonPanel extends JPanel {
 
         txtMaHD.setEditable(false);
         txtNgayLap.setEditable(false);
+        cboKhachHang.setEditable(true);
         cboTrangThai.setEnabled(false);
 
         JLabel lblTitle = new JLabel("LẬP HÓA ĐƠN", SwingConstants.CENTER);
@@ -132,7 +133,7 @@ public class HoaDonPanel extends JPanel {
         addFormRow(hoaDonInfoPanel, gbc, 4, "Nhân viên:", cboNhanVien);
         addFormRow(hoaDonInfoPanel, gbc, 5, "Bàn:", cboBan);
 
-        JLabel lblKhachLe = new JLabel("<html><i>Có thể bỏ trống khách hàng cho hóa đơn khách lẻ.</i></html>");
+        JLabel lblKhachLe = new JLabel("<html><i>Khách hàng có thể để trống, chọn sẵn hoặc tự nhập tên mới.</i></html>");
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 2;
@@ -398,7 +399,17 @@ public class HoaDonPanel extends JPanel {
     }
 
     public KhachHang getKhachHangDangChon() {
-        return (KhachHang) cboKhachHang.getSelectedItem();
+        Object selectedItem = cboKhachHang.getSelectedItem();
+        return selectedItem instanceof KhachHang ? (KhachHang) selectedItem : null;
+    }
+
+    public String getTenKhachHangNhap() {
+        Object editorItem = cboKhachHang.getEditor().getItem();
+        return editorItem == null ? "" : editorItem.toString().trim();
+    }
+
+    public void setTenKhachHangNhap(String tenKhachHang) {
+        cboKhachHang.getEditor().setItem(tenKhachHang == null ? "" : tenKhachHang);
     }
 
     public NhanVien getNhanVienDangChon() {
@@ -431,10 +442,11 @@ public class HoaDonPanel extends JPanel {
         clearMonAnForm();
         txtSoLuong.setText("1");
         cboKhachHang.setSelectedItem(null);
+        cboKhachHang.getEditor().setItem("");
         cboBan.setSelectedItem(null);
         cboTrangThai.setSelectedItem(HoaDonStatus.CREATED);
         cboTrangThai.setEnabled(false);
-        cboKhachHang.requestFocus();
+        cboKhachHang.requestFocusInWindow();
     }
 
     public void clearMonAnForm() {
@@ -448,5 +460,3 @@ public class HoaDonPanel extends JPanel {
         tblChiTietLichSu.clearSelection();
     }
 }
-
-

@@ -9,9 +9,13 @@ public class ThongKePanel extends JPanel {
 
     public static final String CARD_TONG_QUAN = "tongQuan";
     public static final String CARD_MON_AN = "monAn";
+    public static final String CARD_BAN = "ban";
+    public static final String CARD_KHACH_HANG = "khachHang";
 
     private final JButton btnTabTongQuan = new JButton("Tổng quan");
     private final JButton btnTabMonAn = new JButton("Món ăn bán chạy");
+    private final JButton btnTabBan = new JButton("Theo bàn");
+    private final JButton btnTabKhachHang = new JButton("Theo khách hàng");
 
     private final JSpinner spnTuNgay = new JSpinner(new SpinnerDateModel());
     private final JSpinner spnDenNgay = new JSpinner(new SpinnerDateModel());
@@ -43,8 +47,28 @@ public class ThongKePanel extends JPanel {
         }
     };
 
+    private final DefaultTableModel banTableModel = new DefaultTableModel(
+            new Object[]{"Bàn", "Số hóa đơn", "Tổng món", "Doanh thu"}, 0
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+
+    private final DefaultTableModel khachHangTableModel = new DefaultTableModel(
+            new Object[]{"Khách hàng", "Số hóa đơn", "Tổng món", "Doanh thu"}, 0
+    ) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+
     private final JTable tblHoaDon = new JTable(hoaDonTableModel);
     private final JTable tblMonAn = new JTable(monAnTableModel);
+    private final JTable tblBan = new JTable(banTableModel);
+    private final JTable tblKhachHang = new JTable(khachHangTableModel);
 
     public ThongKePanel() {
         setLayout(new BorderLayout());
@@ -64,7 +88,8 @@ public class ThongKePanel extends JPanel {
 
         cardPanel.add(createTongQuanPanel(), CARD_TONG_QUAN);
         cardPanel.add(createMonAnPanel(), CARD_MON_AN);
-
+        cardPanel.add(createBanPanel(), CARD_BAN);
+        cardPanel.add(createKhachHangPanel(), CARD_KHACH_HANG);
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
@@ -84,6 +109,8 @@ public class ThongKePanel extends JPanel {
         JPanel tabPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         tabPanel.add(btnTabTongQuan);
         tabPanel.add(btnTabMonAn);
+        tabPanel.add(btnTabBan);
+        tabPanel.add(btnTabKhachHang);
 
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         filterPanel.add(new JLabel("Từ ngày:"));
@@ -121,6 +148,20 @@ public class ThongKePanel extends JPanel {
         return panel;
     }
 
+    private JPanel createBanPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Thống kê doanh thu theo bàn"));
+        panel.add(new JScrollPane(tblBan), BorderLayout.CENTER);
+        return panel;
+    }
+
+    private JPanel createKhachHangPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createTitledBorder("Thống kê doanh thu theo khách hàng"));
+        panel.add(new JScrollPane(tblKhachHang), BorderLayout.CENTER);
+        return panel;
+    }
+
     private JPanel createStatCard(String title, JLabel valueLabel) {
         valueLabel.setFont(new Font("Arial", Font.BOLD, 24));
 
@@ -142,6 +183,10 @@ public class ThongKePanel extends JPanel {
         tblHoaDon.setAutoCreateRowSorter(true);
         tblMonAn.setRowHeight(24);
         tblMonAn.setAutoCreateRowSorter(true);
+        tblBan.setRowHeight(24);
+        tblBan.setAutoCreateRowSorter(true);
+        tblKhachHang.setRowHeight(24);
+        tblKhachHang.setAutoCreateRowSorter(true);
     }
 
     public void macDinhNgay() {
@@ -153,9 +198,10 @@ public class ThongKePanel extends JPanel {
     public void showCard(String cardName) {
         CardLayout layout = (CardLayout) cardPanel.getLayout();
         layout.show(cardPanel, cardName);
-        boolean tongQuanActive = CARD_TONG_QUAN.equals(cardName);
-        btnTabTongQuan.setEnabled(!tongQuanActive);
-        btnTabMonAn.setEnabled(tongQuanActive);
+        btnTabTongQuan.setEnabled(!CARD_TONG_QUAN.equals(cardName));
+        btnTabMonAn.setEnabled(!CARD_MON_AN.equals(cardName));
+        btnTabBan.setEnabled(!CARD_BAN.equals(cardName));
+        btnTabKhachHang.setEnabled(!CARD_KHACH_HANG.equals(cardName));
     }
 
     public JButton getBtnTabTongQuan() {
@@ -164,6 +210,14 @@ public class ThongKePanel extends JPanel {
 
     public JButton getBtnTabMonAn() {
         return btnTabMonAn;
+    }
+
+    public JButton getBtnTabBan() {
+        return btnTabBan;
+    }
+
+    public JButton getBtnTabKhachHang() {
+        return btnTabKhachHang;
     }
 
     public JSpinner getSpnTuNgay() {
@@ -202,6 +256,14 @@ public class ThongKePanel extends JPanel {
         return tblMonAn;
     }
 
+    public JTable getTblBan() {
+        return tblBan;
+    }
+
+    public JTable getTblKhachHang() {
+        return tblKhachHang;
+    }
+
     public DefaultTableModel getHoaDonTableModel() {
         return hoaDonTableModel;
     }
@@ -209,8 +271,12 @@ public class ThongKePanel extends JPanel {
     public DefaultTableModel getMonAnTableModel() {
         return monAnTableModel;
     }
+
+    public DefaultTableModel getBanTableModel() {
+        return banTableModel;
+    }
+
+    public DefaultTableModel getKhachHangTableModel() {
+        return khachHangTableModel;
+    }
 }
-
-
-
-

@@ -102,7 +102,22 @@ public class KhachHangServiceImpl implements KhachHangService {
         if (maKH == null) {
             throw new IllegalArgumentException("Vui lòng chọn khách hàng cần xóa.");
         }
-        khachHangDAO.delete(maKH);
+
+        KhachHang khachHang = khachHangDAO.findById(maKH);
+        if (khachHang == null) {
+            throw new IllegalArgumentException("Không tìm thấy khách hàng cần xóa.");
+        }
+
+        try {
+            khachHangDAO.delete(maKH);
+        } catch (RuntimeException ex) {
+            if (isDeleteRestrictedByHoaDon(ex)) {
+                throw new IllegalArgumentException(
+                        "Không thể xóa khách hàng này vì khách hàng đã từng phát sinh hóa đơn."
+                );
+            }
+            throw ex;
+        }
     }
 
     private FormData validate(boolean isUpdate, KhachHang khachHangHienTai,
@@ -127,6 +142,23 @@ public class KhachHangServiceImpl implements KhachHangService {
         }
 
         return new FormData(tenKH.trim(), loaiKH);
+    }
+
+    private boolean isDeleteRestrictedByHoaDon(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            String message = current.getMessage();
+            if (message != null) {
+                String normalized = message.toLowerCase(Locale.ROOT);
+                if (normalized.contains("foreign key constraint fails")
+                        || normalized.contains("cannot delete or update a parent row")
+                        || normalized.contains("fk_hoa_don_khach_hang")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     private String safeLower(String value) {
