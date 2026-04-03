@@ -6,8 +6,9 @@ import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
 import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
-import ltw.ck.quanlyquanan.services.ThongKeService.Result;
 import ltw.ck.quanlyquanan.services.ThongKeService;
+import ltw.ck.quanlyquanan.services.ThongKeService.HoaDonRow;
+import ltw.ck.quanlyquanan.services.ThongKeService.Result;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -40,9 +41,10 @@ public class ThongKeServiceImpl implements ThongKeService {
         );
 
         HoaDonStatsDto hoaDonStats = tinhThongKeHoaDon(danhSachHoaDon);
+        List<HoaDonRow> hoaDonRows = taoHoaDonRows(danhSachHoaDon);
         List<MonAnStatsDto> monAnStats = tinhThongKeMonAn(danhSachHoaDon);
 
-        return new Result(hoaDonStats, danhSachHoaDon, monAnStats);
+        return new Result(hoaDonStats, hoaDonRows, monAnStats);
     }
 
     private DateRange layKhoangNgay(Date tuNgayDate, Date denNgayDate) {
@@ -77,6 +79,22 @@ public class ThongKeServiceImpl implements ThongKeService {
         return new HoaDonStatsDto(tongHoaDon, tongDoanhThu, hoaDonHomNay);
     }
 
+    private List<HoaDonRow> taoHoaDonRows(List<HoaDon> dsHoaDon) {
+        List<HoaDonRow> result = new ArrayList<>();
+        for (HoaDon hoaDon : dsHoaDon) {
+            result.add(new HoaDonRow(
+                    hoaDon.getMaHd(),
+                    hoaDon.getNgayLap(),
+                    hoaDon.getKhachHang() == null ? "Khách lẻ" : hoaDon.getKhachHang().getTenKh(),
+                    hoaDon.getNhanVien() == null ? "" : hoaDon.getNhanVien().getHoTen(),
+                    hoaDon.getBan() == null ? "" : hoaDon.getBan().getTenBan(),
+                    tinhTongSoLuong(hoaDon),
+                    tinhTongTienHoaDon(hoaDon)
+            ));
+        }
+        return result;
+    }
+
     private List<MonAnStatsDto> tinhThongKeMonAn(List<HoaDon> dsHoaDon) {
         Map<String, Long> thongKeMonAn = new HashMap<>();
 
@@ -105,8 +123,23 @@ public class ThongKeServiceImpl implements ThongKeService {
         return result;
     }
 
+    private int tinhTongSoLuong(HoaDon hoaDon) {
+        int tong = 0;
+        if (hoaDon.getLstChiTietHoaDon() == null) {
+            return tong;
+        }
+
+        for (ChiTietHD chiTietHD : hoaDon.getLstChiTietHoaDon()) {
+            tong += chiTietHD.getSoLuong() == null ? 0 : chiTietHD.getSoLuong();
+        }
+        return tong;
+    }
+
     private double tinhTongTienHoaDon(HoaDon hoaDon) {
         double tong = 0;
+        if (hoaDon.getLstChiTietHoaDon() == null) {
+            return tong;
+        }
 
         for (ChiTietHD chiTietHD : hoaDon.getLstChiTietHoaDon()) {
             if (chiTietHD.getMonAn() != null
@@ -128,4 +161,3 @@ public class ThongKeServiceImpl implements ThongKeService {
     private record DateRange(LocalDateTime from, LocalDateTime to) {
     }
 }
-

@@ -2,10 +2,9 @@ package ltw.ck.quanlyquanan.controller;
 
 import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
-import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
-import ltw.ck.quanlyquanan.model.entity.HoaDon;
-import ltw.ck.quanlyquanan.services.ThongKeService.Result;
 import ltw.ck.quanlyquanan.services.ThongKeService;
+import ltw.ck.quanlyquanan.services.ThongKeService.HoaDonRow;
+import ltw.ck.quanlyquanan.services.ThongKeService.Result;
 import ltw.ck.quanlyquanan.services.impl.ThongKeServiceImpl;
 import ltw.ck.quanlyquanan.view.ThongKePanel;
 
@@ -54,7 +53,7 @@ public class ThongKeController {
                     (java.util.Date) view.getSpnDenNgay().getValue()
             );
 
-            hienThiThongKeHoaDon(result.hoaDonStats(), result.danhSachHoaDon());
+            hienThiThongKeHoaDon(result.hoaDonStats(), result.hoaDonRows());
             hienThiThongKeMonAn(result.monAnStats());
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(
@@ -68,7 +67,7 @@ public class ThongKeController {
         }
     }
 
-    private void hienThiThongKeHoaDon(HoaDonStatsDto stats, List<HoaDon> dsHoaDon) {
+    private void hienThiThongKeHoaDon(HoaDonStatsDto stats, List<HoaDonRow> rows) {
         view.getLblTongHoaDon().setText(String.valueOf(stats.getTotalHoaDon()));
         view.getLblTongDoanhThu().setText(MONEY_FORMAT.format(stats.getTongDoanhThu()) + " đ");
         view.getLblHoaDonHomNay().setText(String.valueOf(stats.getHoaDonHomNay()));
@@ -76,15 +75,15 @@ public class ThongKeController {
         DefaultTableModel tableModel = view.getHoaDonTableModel();
         tableModel.setRowCount(0);
 
-        for (HoaDon hoaDon : dsHoaDon) {
+        for (HoaDonRow row : rows) {
             tableModel.addRow(new Object[]{
-                    hoaDon.getMaHd(),
-                    formatDateTime(hoaDon.getNgayLap()),
-                    hoaDon.getKhachHang() == null ? "Khách lẻ" : hoaDon.getKhachHang().getTenKh(),
-                    hoaDon.getNhanVien() == null ? "" : hoaDon.getNhanVien().getHoTen(),
-                    hoaDon.getBan() == null ? "" : hoaDon.getBan().getTenBan(),
-                    tinhTongSoLuong(hoaDon.getLstChiTietHoaDon()),
-                    MONEY_FORMAT.format(tinhTongTienHoaDon(hoaDon))
+                    row.maHd(),
+                    formatDateTime(row.ngayLap()),
+                    row.tenKhachHang(),
+                    row.tenNhanVien(),
+                    row.tenBan(),
+                    row.tongSoLuong(),
+                    MONEY_FORMAT.format(row.tongTien())
             });
         }
     }
@@ -108,26 +107,6 @@ public class ThongKeController {
         thongKe();
     }
 
-    private int tinhTongSoLuong(List<ChiTietHD> dsChiTiet) {
-        int tong = 0;
-        for (ChiTietHD chiTietHD : dsChiTiet) {
-            tong += chiTietHD.getSoLuong() == null ? 0 : chiTietHD.getSoLuong();
-        }
-        return tong;
-    }
-
-    private double tinhTongTienHoaDon(HoaDon hoaDon) {
-        double tong = 0;
-        for (ChiTietHD chiTietHD : hoaDon.getLstChiTietHoaDon()) {
-            if (chiTietHD.getMonAn() != null
-                    && chiTietHD.getMonAn().getDonGia() != null
-                    && chiTietHD.getSoLuong() != null) {
-                tong += chiTietHD.getMonAn().getDonGia() * chiTietHD.getSoLuong();
-            }
-        }
-        return tong;
-    }
-
     private String formatDateTime(LocalDateTime dateTime) {
         return dateTime == null ? "" : DATE_TIME_FORMATTER.format(dateTime);
     }
@@ -145,4 +124,3 @@ public class ThongKeController {
         view.setVisible(true);
     }
 }
-

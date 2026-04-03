@@ -11,9 +11,9 @@ public class MainFrame extends JFrame {
     private final JLabel lblTitle = new JLabel("HỆ THỐNG QUẢN LÝ QUÁN ĂN", SwingConstants.CENTER);
     private final JLabel lblWelcome = new JLabel("Xin chào!", SwingConstants.CENTER);
 
-    private final JButton btnMonAn = new JButton("Quản lý món ăn");
-    private final JButton btnKhachHang = new JButton("Quản lý khách hàng");
-    private final JButton btnNhanVien = new JButton("Quản lý nhân viên");
+    private final JButton btnMonAn = new JButton("Món ăn");
+    private final JButton btnKhachHang = new JButton("Khách hàng");
+    private final JButton btnNhanVien = new JButton("Nhân viên");
     private final JButton btnHoaDon = new JButton("Hóa đơn");
     private final JButton btnThongKe = new JButton("Thống kê");
     private final JButton btnDangXuat = new JButton("Đăng xuất");
@@ -40,9 +40,9 @@ public class MainFrame extends JFrame {
         menuPanel.setBorder(BorderFactory.createTitledBorder("Chức năng"));
         menuPanel.add(btnHoaDon);
         menuPanel.add(btnKhachHang);
-        menuPanel.add(btnNhanVien);
         menuPanel.add(btnMonAn);
         menuPanel.add(btnThongKe);
+        menuPanel.add(btnNhanVien);
 
         JPanel actionPanel = new JPanel(new GridLayout(2, 1, 0, 10));
         actionPanel.setBorder(BorderFactory.createTitledBorder("Hệ thống"));

@@ -1,15 +1,19 @@
 package ltw.ck.quanlyquanan.controller;
 
+import ltw.ck.quanlyquanan.model.dto.ChiTietHDDto;
+
 import ltw.ck.quanlyquanan.model.entity.Ban;
-import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
 import ltw.ck.quanlyquanan.services.AppSession;
-import ltw.ck.quanlyquanan.services.HoaDonService.ItemData;
 import ltw.ck.quanlyquanan.services.HoaDonService;
+import ltw.ck.quanlyquanan.services.HoaDonService.DanhMucData;
+import ltw.ck.quanlyquanan.services.HoaDonService.FormData;
+import ltw.ck.quanlyquanan.services.HoaDonService.HistoryRow;
+import ltw.ck.quanlyquanan.services.HoaDonService.ItemData;
 import ltw.ck.quanlyquanan.services.impl.HoaDonServiceImpl;
 import ltw.ck.quanlyquanan.view.HoaDonPanel;
 
@@ -33,10 +37,6 @@ public class HoaDonController {
     private final HoaDonService hoaDonService;
 
     private List<HoaDon> danhSachHoaDon = new ArrayList<>();
-    private List<KhachHang> danhSachKhachHang = new ArrayList<>();
-    private List<NhanVien> danhSachNhanVien = new ArrayList<>();
-    private List<Ban> danhSachBan = new ArrayList<>();
-    private List<MonAn> danhSachMonAn = new ArrayList<>();
     private List<ItemData> chiTietTam = new ArrayList<>();
 
     private HoaDon hoaDonDangChon;
@@ -84,20 +84,20 @@ public class HoaDonController {
 
     private void taiDuLieuDanhMuc() {
         try {
-            taiKhachHang();
-            taiNhanVien();
-            taiBan();
-            taiMonAn();
+            DanhMucData danhMucData = hoaDonService.loadDanhMuc();
+            taiKhachHang(danhMucData.khachHangs());
+            taiNhanVien(danhMucData.nhanViens());
+            taiBan(danhMucData.bans());
+            taiMonAn(danhMucData.monAns());
         } catch (Exception ex) {
             hienThiLoi("Không thể tải dữ liệu danh mục", ex);
         }
     }
 
-    private void taiKhachHang() {
-        danhSachKhachHang = new ArrayList<>(hoaDonService.findAllKhachHang());
+    private void taiKhachHang(List<KhachHang> khachHangs) {
         DefaultComboBoxModel<KhachHang> model = new DefaultComboBoxModel<>();
         model.addElement(null);
-        for (KhachHang khachHang : danhSachKhachHang) {
+        for (KhachHang khachHang : khachHangs) {
             model.addElement(khachHang);
         }
         view.getCboKhachHang().setModel(model);
@@ -105,15 +105,14 @@ public class HoaDonController {
         view.getCboKhachHang().setRenderer(new NullableObjectRenderer("Khách lẻ"));
     }
 
-    private void taiNhanVien() {
+    private void taiNhanVien(List<NhanVien> nhanViens) {
         nhanVienDangNhap = AppSession.getCurrentNhanVien();
-        danhSachNhanVien = new ArrayList<>(hoaDonService.findAllNhanVien());
 
         DefaultComboBoxModel<NhanVien> model = new DefaultComboBoxModel<>();
         if (nhanVienDangNhap != null) {
             model.addElement(nhanVienDangNhap);
         } else {
-            for (NhanVien nhanVien : danhSachNhanVien) {
+            for (NhanVien nhanVien : nhanViens) {
                 model.addElement(nhanVien);
             }
         }
@@ -125,20 +124,18 @@ public class HoaDonController {
         }
     }
 
-    private void taiBan() {
-        danhSachBan = new ArrayList<>(hoaDonService.findAllBan());
+    private void taiBan(List<Ban> bans) {
         DefaultComboBoxModel<Ban> model = new DefaultComboBoxModel<>();
-        for (Ban ban : danhSachBan) {
+        for (Ban ban : bans) {
             model.addElement(ban);
         }
         view.getCboBan().setModel(model);
         view.getCboBan().setSelectedItem(null);
     }
 
-    private void taiMonAn() {
-        danhSachMonAn = new ArrayList<>(hoaDonService.findAllMonAn());
+    private void taiMonAn(List<MonAn> monAns) {
         DefaultComboBoxModel<MonAn> model = new DefaultComboBoxModel<>();
-        for (MonAn monAn : danhSachMonAn) {
+        for (MonAn monAn : monAns) {
             model.addElement(monAn);
         }
         view.getCboMonAn().setModel(model);
@@ -151,7 +148,7 @@ public class HoaDonController {
             doDuLieuHoaDonLenBang(danhSachHoaDon);
             xoaChiTietLichSu();
             hoaDonDangChon = null;
-            capNhatTrangThaiNutLichSu(false);
+            capNhatTrangThaiNutLichSu();
         } catch (Exception ex) {
             hienThiLoi("Không thể tải danh sách hóa đơn", ex);
         }
@@ -163,7 +160,7 @@ public class HoaDonController {
             doDuLieuHoaDonLenBang(danhSachHoaDon);
             xoaChiTietLichSu();
             hoaDonDangChon = null;
-            capNhatTrangThaiNutLichSu(false);
+            capNhatTrangThaiNutLichSu();
 
             if (danhSachHoaDon.isEmpty()) {
                 JOptionPane.showMessageDialog(view, "Không tìm thấy hóa đơn phù hợp.");
@@ -177,16 +174,16 @@ public class HoaDonController {
         DefaultTableModel tableModel = view.getHoaDonTableModel();
         tableModel.setRowCount(0);
 
-        for (HoaDon hoaDon : dsHoaDon) {
+        for (HistoryRow row : hoaDonService.toHistoryRows(dsHoaDon)) {
             tableModel.addRow(new Object[]{
-                    hoaDon.getMaHd(),
-                    formatDateTime(hoaDon.getNgayLap()),
-                    hoaDon.getTrangThai() == null ? "" : hoaDon.getTrangThai().name(),
-                    hoaDon.getKhachHang() == null ? "Khách lẻ" : hoaDon.getKhachHang().getTenKh(),
-                    hoaDon.getNhanVien() == null ? "" : hoaDon.getNhanVien().getHoTen(),
-                    hoaDon.getBan() == null ? "" : hoaDon.getBan().getTenBan(),
-                    tinhTongSoLuongEntity(hoaDon.getLstChiTietHoaDon()),
-                    formatMoney(hoaDonService.tinhTongTienHoaDon(hoaDon))
+                    row.maHd(),
+                    formatDateTime(row.ngayLap()),
+                    row.trangThai() == null ? "" : row.trangThai().name(),
+                    row.tenKhachHang(),
+                    row.tenNhanVien(),
+                    row.tenBan(),
+                    row.tongSoLuong(),
+                    formatMoney(row.tongTien())
             });
         }
     }
@@ -200,7 +197,7 @@ public class HoaDonController {
         if (selectedRow < 0) {
             hoaDonDangChon = null;
             xoaChiTietLichSu();
-            capNhatTrangThaiNutLichSu(false);
+            capNhatTrangThaiNutLichSu();
             return;
         }
 
@@ -210,12 +207,12 @@ public class HoaDonController {
 
         if (hoaDonDangChon == null) {
             xoaChiTietLichSu();
-            capNhatTrangThaiNutLichSu(false);
+            capNhatTrangThaiNutLichSu();
             return;
         }
 
-        doDuLieuChiTietLichSuLenBang(hoaDonService.toItemDataList(hoaDonDangChon));
-        capNhatTrangThaiNutLichSu(true);
+        doDuLieuChiTietLichSuLenBang(hoaDonDangChon);
+        capNhatTrangThaiNutLichSu();
     }
 
     private void xuLyChonChiTietForm(ListSelectionEvent event) {
@@ -246,34 +243,34 @@ public class HoaDonController {
         DefaultTableModel tableModel = view.getChiTietFormTableModel();
         tableModel.setRowCount(0);
 
-        for (ItemData item : chiTietTam) {
+        for (ChiTietHDDto item : hoaDonService.toChiTietHDDtos(chiTietTam)) {
             tableModel.addRow(new Object[]{
-                    item.maMon(),
-                    item.tenMon(),
-                    formatMoney(item.donGia()),
-                    item.soLuong(),
-                    formatMoney(item.thanhTien())
+                    item.getMaMon(),
+                    item.getTenMon(),
+                    formatMoney(item.getDonGia()),
+                    item.getSoLuong(),
+                    formatMoney(item.getThanhTien())
             });
         }
 
         view.getLblTongTienForm().setText("Tổng tiền: " + formatMoney(hoaDonService.tinhTongTien(chiTietTam)) + " đ");
     }
 
-    private void doDuLieuChiTietLichSuLenBang(List<ItemData> items) {
+    private void doDuLieuChiTietLichSuLenBang(HoaDon hoaDon) {
         DefaultTableModel tableModel = view.getChiTietLichSuTableModel();
         tableModel.setRowCount(0);
 
-        for (ItemData item : items) {
+        for (ChiTietHDDto item : hoaDonService.toChiTietHDDtos(hoaDon)) {
             tableModel.addRow(new Object[]{
-                    item.maMon(),
-                    item.tenMon(),
-                    formatMoney(item.donGia()),
-                    item.soLuong(),
-                    formatMoney(item.thanhTien())
+                    item.getMaMon(),
+                    item.getTenMon(),
+                    formatMoney(item.getDonGia()),
+                    item.getSoLuong(),
+                    formatMoney(item.getThanhTien())
             });
         }
 
-        view.getLblTongTienLichSu().setText("Tổng tiền: " + formatMoney(hoaDonService.tinhTongTien(items)) + " đ");
+        view.getLblTongTienLichSu().setText("Tổng tiền: " + formatMoney(hoaDonService.tinhTongTienHoaDon(hoaDon)) + " đ");
     }
 
     private void xoaChiTietLichSu() {
@@ -358,11 +355,6 @@ public class HoaDonController {
             );
 
             HoaDon hoaDonDaLuu = hoaDonService.findById(hoaDon.getMaHd());
-            if (hoaDonDaLuu == null) {
-                JOptionPane.showMessageDialog(view, "Không thể tải lại hóa đơn vừa tạo.");
-                return;
-            }
-
             taiDanhSachHoaDon();
             apHoaDonLenForm(hoaDonDaLuu);
 
@@ -399,9 +391,7 @@ public class HoaDonController {
             );
 
             taiDanhSachHoaDon();
-            if (hoaDonDaCapNhat != null) {
-                apHoaDonLenForm(hoaDonDaCapNhat);
-            }
+            apHoaDonLenForm(hoaDonDaCapNhat);
 
             view.showCard(HoaDonPanel.CARD_LAP_HOA_DON);
             capNhatTrangThaiNutForm(true);
@@ -422,11 +412,16 @@ public class HoaDonController {
             return;
         }
 
-        apHoaDonLenForm(hoaDonDangChon);
-        view.clearMonAnForm();
-        capNhatTrangThaiNutForm(true);
-        capNhatTrangThaiNutMon(false);
-        view.showCard(HoaDonPanel.CARD_LAP_HOA_DON);
+        try {
+            hoaDonService.validateEditable(hoaDonDangChon);
+            apHoaDonLenForm(hoaDonDangChon);
+            view.clearMonAnForm();
+            capNhatTrangThaiNutForm(true);
+            capNhatTrangThaiNutMon(false);
+            view.showCard(HoaDonPanel.CARD_LAP_HOA_DON);
+        } catch (IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void xoaHoaDon() {
@@ -465,25 +460,18 @@ public class HoaDonController {
 
     private void apHoaDonLenForm(HoaDon hoaDon) {
         hoaDonDangChon = hoaDon;
-        chiTietTam = hoaDonService.toItemDataList(hoaDon);
+
+        FormData formData = hoaDonService.toFormData(hoaDon);
+        chiTietTam = new ArrayList<>(formData.items());
         doDuLieuChiTietFormLenBang();
 
-        view.setMaHoaDon(String.valueOf(hoaDon.getMaHd()));
-        view.setNgayLap(formatDateTime(hoaDon.getNgayLap()));
-        view.setTrangThai(hoaDon.getTrangThai());
+        view.setMaHoaDon(String.valueOf(formData.maHd()));
+        view.setNgayLap(formatDateTime(formData.ngayLap()));
+        view.setTrangThai(formData.trangThai());
         view.setTrangThaiEditable(true);
 
-        selectComboItemById(
-                view.getCboKhachHang(),
-                hoaDon.getKhachHang() == null ? null : hoaDon.getKhachHang().getMaKh(),
-                KhachHang::getMaKh
-        );
-
-        selectComboItemById(
-                view.getCboBan(),
-                hoaDon.getBan() == null ? null : hoaDon.getBan().getMaBan(),
-                Ban::getMaBan
-        );
+        selectComboItemById(view.getCboKhachHang(), formData.maKhachHang(), KhachHang::getMaKh);
+        selectComboItemById(view.getCboBan(), formData.maBan(), Ban::getMaBan);
 
         if (nhanVienDangNhap != null) {
             view.getCboNhanVien().setSelectedIndex(0);
@@ -492,6 +480,7 @@ public class HoaDonController {
 
     private void lamMoiForm() {
         chiTietTam = new ArrayList<>();
+        hoaDonDangChon = null;
         view.clearHoaDonForm();
         doDuLieuChiTietFormLenBang();
         view.setNgayLap(formatDateTime(LocalDateTime.now()));
@@ -503,6 +492,7 @@ public class HoaDonController {
 
         capNhatTrangThaiNutForm(false);
         capNhatTrangThaiNutMon(false);
+        capNhatTrangThaiNutLichSu();
     }
 
     private void chonChiTietTheoMaMon(Long maMon) {
@@ -570,14 +560,6 @@ public class HoaDonController {
         }
     }
 
-    private int tinhTongSoLuongEntity(List<ChiTietHD> chiTietHDList) {
-        int tong = 0;
-        for (ChiTietHD chiTietHD : chiTietHDList) {
-            tong += chiTietHD.getSoLuong() == null ? 0 : chiTietHD.getSoLuong();
-        }
-        return tong;
-    }
-
     private void capNhatTrangThaiNutForm(boolean dangSuaHoaDon) {
         view.getBtnThemHoaDon().setEnabled(!dangSuaHoaDon);
         view.getBtnCapNhatHoaDon().setEnabled(dangSuaHoaDon);
@@ -590,9 +572,10 @@ public class HoaDonController {
         view.getBtnXoaMon().setEnabled(dangChonMon);
     }
 
-    private void capNhatTrangThaiNutLichSu(boolean dangChonHoaDon) {
-        view.getBtnChinhSua().setEnabled(dangChonHoaDon);
-        view.getBtnXoaHoaDon().setEnabled(dangChonHoaDon);
+    private void capNhatTrangThaiNutLichSu() {
+        boolean editable = hoaDonService.isEditable(hoaDonDangChon);
+        view.getBtnChinhSua().setEnabled(editable);
+        view.getBtnXoaHoaDon().setEnabled(editable);
     }
 
     private String formatDateTime(LocalDateTime dateTime) {
@@ -626,4 +609,6 @@ public class HoaDonController {
         }
     }
 }
+
+
 
