@@ -32,6 +32,7 @@ import java.util.Locale;
 
 public class HoaDonServiceImpl implements HoaDonService {
 
+    private static final String LOAI_KHACH_HANG_MAC_DINH = "Khách lẻ";
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -481,13 +482,13 @@ public class HoaDonServiceImpl implements HoaDonService {
     }
 
     private LoaiKH layLoaiKhachHangMacDinh() {
-        List<LoaiKH> loaiKhs = loaiKhachHangDAO.findAll();
-        if (loaiKhs.isEmpty()) {
+        LoaiKH loaiKhachHang = loaiKhachHangDAO.findByTenLoaiKh(LOAI_KHACH_HANG_MAC_DINH);
+        if (loaiKhachHang == null) {
             throw new IllegalStateException(
-                    "Không thể tạo khách hàng mới vì chưa có loại khách hàng nào trong hệ thống."
+                    "Chưa cấu hình loại khách hàng mặc định 'Khách lẻ'."
             );
         }
-        return loaiKhs.get(0);
+        return loaiKhachHang;
     }
 
     private ItemData timItemTheoMaMon(List<ItemData> items, Long maMon) {
@@ -515,3 +516,5 @@ public class HoaDonServiceImpl implements HoaDonService {
         return dateTime == null ? "" : DATE_TIME_FORMATTER.format(dateTime);
     }
 }
+
+

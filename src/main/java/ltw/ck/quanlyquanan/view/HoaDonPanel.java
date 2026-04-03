@@ -2,6 +2,7 @@ package ltw.ck.quanlyquanan.view;
 
 import ltw.ck.quanlyquanan.model.entity.Ban;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
+import ltw.ck.quanlyquanan.model.entity.LoaiMonAn;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
@@ -28,6 +29,7 @@ public class HoaDonPanel extends JPanel {
     private final JComboBox<KhachHang> cboKhachHang = new JComboBox<>();
     private final JComboBox<NhanVien> cboNhanVien = new JComboBox<>();
     private final JComboBox<Ban> cboBan = new JComboBox<>();
+    private final JComboBox<LoaiMonAn> cboLocLoaiMonAn = new JComboBox<>();
     private final JComboBox<MonAn> cboMonAn = new JComboBox<>();
     private final JComboBox<HoaDonStatus> cboTrangThai = new JComboBox<>(HoaDonStatus.values());
 
@@ -133,7 +135,7 @@ public class HoaDonPanel extends JPanel {
         addFormRow(hoaDonInfoPanel, gbc, 4, "Nhân viên:", cboNhanVien);
         addFormRow(hoaDonInfoPanel, gbc, 5, "Bàn:", cboBan);
 
-        JLabel lblKhachLe = new JLabel("<html><i>Khách hàng có thể để trống, chọn sẵn hoặc tự nhập tên mới.</i></html>");
+        JLabel lblKhachLe = new JLabel("<html><i>Khách hàng có thể để trống xem như khách vãng lai, chọn sẵn hoặc tự nhập tên mới.</i></html>");
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 2;
@@ -143,8 +145,9 @@ public class HoaDonPanel extends JPanel {
         monAnPanel.setBorder(BorderFactory.createTitledBorder("Nhập món ăn"));
 
         GridBagConstraints itemGbc = createGbc();
-        addFormRow(monAnPanel, itemGbc, 0, "Món ăn:", cboMonAn);
-        addFormRow(monAnPanel, itemGbc, 1, "Số lượng:", txtSoLuong);
+        addFormRow(monAnPanel, itemGbc, 1, "Món ăn:", cboMonAn);
+        addFormRow(monAnPanel, itemGbc, 0, "Loại món:", cboLocLoaiMonAn);
+        addFormRow(monAnPanel, itemGbc, 2, "Số lượng:", txtSoLuong);
 
         JPanel itemActionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         itemActionPanel.add(btnThemMon);
@@ -152,7 +155,7 @@ public class HoaDonPanel extends JPanel {
         itemActionPanel.add(btnXoaMon);
 
         itemGbc.gridx = 0;
-        itemGbc.gridy = 2;
+        itemGbc.gridy = 3;
         itemGbc.gridwidth = 2;
         monAnPanel.add(itemActionPanel, itemGbc);
 
@@ -294,6 +297,10 @@ public class HoaDonPanel extends JPanel {
         return cboBan;
     }
 
+    public JComboBox<LoaiMonAn> getCboLocLoaiMonAn() {
+        return cboLocLoaiMonAn;
+    }
+
     public JComboBox<MonAn> getCboMonAn() {
         return cboMonAn;
     }
@@ -420,6 +427,10 @@ public class HoaDonPanel extends JPanel {
         return (Ban) cboBan.getSelectedItem();
     }
 
+    public LoaiMonAn getLoaiMonAnLocDangChon() {
+        return (LoaiMonAn) cboLocLoaiMonAn.getSelectedItem();
+    }
+
     public MonAn getMonAnDangChon() {
         return (MonAn) cboMonAn.getSelectedItem();
     }
@@ -440,6 +451,7 @@ public class HoaDonPanel extends JPanel {
         txtMaHD.setText("");
         txtNgayLap.setText("");
         clearMonAnForm();
+        clearBoLocMonAn();
         txtSoLuong.setText("1");
         cboKhachHang.setSelectedItem(null);
         cboKhachHang.getEditor().setItem("");
@@ -453,6 +465,10 @@ public class HoaDonPanel extends JPanel {
         cboMonAn.setSelectedItem(null);
         txtSoLuong.setText("1");
         tblChiTietForm.clearSelection();
+    }
+
+    public void clearBoLocMonAn() {
+        cboLocLoaiMonAn.setSelectedItem(null);
     }
 
     public void clearLichSuSelection() {
