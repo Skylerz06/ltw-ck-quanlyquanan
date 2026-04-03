@@ -7,7 +7,6 @@ import ltw.ck.quanlyquanan.model.dao.impl.LoaiKhachHangDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.LoaiKH;
 import ltw.ck.quanlyquanan.services.KhachHangService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,12 +80,12 @@ public class KhachHangServiceImpl implements KhachHangService {
     @Override
     public KhachHang update(Long maKH, String tenKH, LoaiKH loaiKH) {
         if (maKH == null) {
-            throw new ServiceException("Vui lòng chọn khách hàng cần cập nhật.");
+            throw new IllegalArgumentException("Vui lòng chọn khách hàng cần cập nhật.");
         }
 
         KhachHang khachHang = khachHangDAO.findById(maKH);
         if (khachHang == null) {
-            throw new ServiceException("Không tìm thấy khách hàng cần cập nhật.");
+            throw new IllegalArgumentException("Không tìm thấy khách hàng cần cập nhật.");
         }
 
         FormData formData = validate(true, khachHang, tenKH, loaiKH);
@@ -101,7 +100,7 @@ public class KhachHangServiceImpl implements KhachHangService {
     @Override
     public void delete(Long maKH) {
         if (maKH == null) {
-            throw new ServiceException("Vui lòng chọn khách hàng cần xóa.");
+            throw new IllegalArgumentException("Vui lòng chọn khách hàng cần xóa.");
         }
         khachHangDAO.delete(maKH);
     }
@@ -109,11 +108,11 @@ public class KhachHangServiceImpl implements KhachHangService {
     private FormData validate(boolean isUpdate, KhachHang khachHangHienTai,
                               String tenKH, LoaiKH loaiKH) {
         if (tenKH == null || tenKH.isBlank()) {
-            throw new ServiceException("Vui lòng nhập tên khách hàng.");
+            throw new IllegalArgumentException("Vui lòng nhập tên khách hàng.");
         }
 
         if (loaiKH == null) {
-            throw new ServiceException("Vui lòng chọn loại khách hàng.");
+            throw new IllegalArgumentException("Vui lòng chọn loại khách hàng.");
         }
 
         List<KhachHang> khachHangCungTen = khachHangDAO.findByTenKh(tenKH.trim());
@@ -123,7 +122,7 @@ public class KhachHangServiceImpl implements KhachHangService {
                     && item.getMaKh().equals(khachHangHienTai.getMaKh());
 
             if (!isSameKhachHang && item.getTenKh().equalsIgnoreCase(tenKH.trim())) {
-                throw new ServiceException("Tên khách hàng đã tồn tại.");
+                throw new IllegalArgumentException("Tên khách hàng đã tồn tại.");
             }
         }
 

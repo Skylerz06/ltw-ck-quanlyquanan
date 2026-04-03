@@ -17,9 +17,8 @@ import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
-import ltw.ck.quanlyquanan.services.HoaDonItemData;
+import ltw.ck.quanlyquanan.services.HoaDonService.ItemData;
 import ltw.ck.quanlyquanan.services.HoaDonService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -130,7 +129,7 @@ public class HoaDonServiceImpl implements HoaDonService {
     @Override
     public HoaDon findById(Long maHd) {
         if (maHd == null) {
-            throw new ServiceException("Không tìm thấy hóa đơn.");
+            throw new IllegalArgumentException("Không tìm thấy hóa đơn.");
         }
         return hoaDonDAO.findById(maHd);
     }
@@ -138,7 +137,7 @@ public class HoaDonServiceImpl implements HoaDonService {
     @Override
     public void delete(Long maHd) {
         if (maHd == null) {
-            throw new ServiceException("Vui lòng chọn hóa đơn cần xóa.");
+            throw new IllegalArgumentException("Vui lòng chọn hóa đơn cần xóa.");
         }
         hoaDonDAO.delete(maHd);
     }
@@ -148,7 +147,7 @@ public class HoaDonServiceImpl implements HoaDonService {
                          NhanVien nhanVien,
                          Ban ban,
                          HoaDonStatus trangThai,
-                         List<HoaDonItemData> items) {
+                         List<ItemData> items) {
         validateHeader(nhanVien, ban, trangThai, items);
 
         HoaDon hoaDon = new HoaDon();
@@ -169,14 +168,14 @@ public class HoaDonServiceImpl implements HoaDonService {
                          NhanVien nhanVien,
                          Ban ban,
                          HoaDonStatus trangThai,
-                         List<HoaDonItemData> items) {
+                         List<ItemData> items) {
         if (maHd == null) {
-            throw new ServiceException("Vui lòng chọn hóa đơn cần cập nhật.");
+            throw new IllegalArgumentException("Vui lòng chọn hóa đơn cần cập nhật.");
         }
 
         HoaDon hoaDon = hoaDonDAO.findById(maHd);
         if (hoaDon == null) {
-            throw new ServiceException("Không tìm thấy hóa đơn cần cập nhật.");
+            throw new IllegalArgumentException("Không tìm thấy hóa đơn cần cập nhật.");
         }
 
         validateHeader(nhanVien, ban, trangThai, items);
@@ -193,15 +192,15 @@ public class HoaDonServiceImpl implements HoaDonService {
     }
 
     @Override
-    public List<HoaDonItemData> toItemDataList(HoaDon hoaDon) {
-        List<HoaDonItemData> result = new ArrayList<>();
+    public List<ItemData> toItemDataList(HoaDon hoaDon) {
+        List<ItemData> result = new ArrayList<>();
         if (hoaDon == null || hoaDon.getLstChiTietHoaDon() == null) {
             return result;
         }
 
         for (ChiTietHD chiTietHD : hoaDon.getLstChiTietHoaDon()) {
             if (chiTietHD.getMonAn() != null && chiTietHD.getSoLuong() != null) {
-                result.add(new HoaDonItemData(
+                result.add(new ItemData(
                         chiTietHD.getMonAn().getMaMon(),
                         chiTietHD.getMonAn().getTenMon(),
                         chiTietHD.getMonAn().getDonGia(),
@@ -210,55 +209,55 @@ public class HoaDonServiceImpl implements HoaDonService {
             }
         }
 
-        result.sort(Comparator.comparing(HoaDonItemData::maMon));
+        result.sort(Comparator.comparing(ItemData::maMon));
         return result;
     }
 
     @Override
-    public List<HoaDonItemData> addItem(List<HoaDonItemData> currentItems, MonAn monAn, String soLuongText) {
+    public List<ItemData> addItem(List<ItemData> currentItems, MonAn monAn, String soLuongText) {
         if (monAn == null) {
-            throw new ServiceException("Vui lòng chọn món ăn.");
+            throw new IllegalArgumentException("Vui lòng chọn món ăn.");
         }
 
         int soLuong = parseSoLuong(soLuongText);
-        List<HoaDonItemData> result = saoChep(currentItems);
+        List<ItemData> result = saoChep(currentItems);
 
         if (timItemTheoMaMon(result, monAn.getMaMon()) != null) {
-            throw new ServiceException("Món ăn này đã có trong hóa đơn.");
+            throw new IllegalArgumentException("Món ăn này đã có trong hóa đơn.");
         }
 
-        result.add(new HoaDonItemData(
+        result.add(new ItemData(
                 monAn.getMaMon(),
                 monAn.getTenMon(),
                 monAn.getDonGia(),
                 soLuong
         ));
 
-        result.sort(Comparator.comparing(HoaDonItemData::maMon));
+        result.sort(Comparator.comparing(ItemData::maMon));
         return result;
     }
 
     @Override
-    public List<HoaDonItemData> updateItem(List<HoaDonItemData> currentItems, Long maMonCu, MonAn monAnMoi, String soLuongText) {
+    public List<ItemData> updateItem(List<ItemData> currentItems, Long maMonCu, MonAn monAnMoi, String soLuongText) {
         if (maMonCu == null) {
-            throw new ServiceException("Vui lòng chọn món cần cập nhật.");
+            throw new IllegalArgumentException("Vui lòng chọn món cần cập nhật.");
         }
         if (monAnMoi == null) {
-            throw new ServiceException("Vui lòng chọn món ăn.");
+            throw new IllegalArgumentException("Vui lòng chọn món ăn.");
         }
 
         int soLuongMoi = parseSoLuong(soLuongText);
-        List<HoaDonItemData> result = saoChep(currentItems);
+        List<ItemData> result = saoChep(currentItems);
 
-        HoaDonItemData itemKhac = timItemTheoMaMon(result, monAnMoi.getMaMon());
+        ItemData itemKhac = timItemTheoMaMon(result, monAnMoi.getMaMon());
         if (itemKhac != null && !maMonCu.equals(monAnMoi.getMaMon())) {
-            throw new ServiceException("Món ăn này đã tồn tại trong hóa đơn.");
+            throw new IllegalArgumentException("Món ăn này đã tồn tại trong hóa đơn.");
         }
 
         boolean found = false;
         for (int i = 0; i < result.size(); i++) {
             if (result.get(i).maMon().equals(maMonCu)) {
-                result.set(i, new HoaDonItemData(
+                result.set(i, new ItemData(
                         monAnMoi.getMaMon(),
                         monAnMoi.getTenMon(),
                         monAnMoi.getDonGia(),
@@ -270,41 +269,41 @@ public class HoaDonServiceImpl implements HoaDonService {
         }
 
         if (!found) {
-            throw new ServiceException("Không tìm thấy món cần cập nhật.");
+            throw new IllegalArgumentException("Không tìm thấy món cần cập nhật.");
         }
 
-        result.sort(Comparator.comparing(HoaDonItemData::maMon));
+        result.sort(Comparator.comparing(ItemData::maMon));
         return result;
     }
 
     @Override
-    public List<HoaDonItemData> removeItem(List<HoaDonItemData> currentItems, Long maMon) {
+    public List<ItemData> removeItem(List<ItemData> currentItems, Long maMon) {
         if (maMon == null) {
-            throw new ServiceException("Vui lòng chọn món cần xóa.");
+            throw new IllegalArgumentException("Vui lòng chọn món cần xóa.");
         }
 
-        List<HoaDonItemData> result = saoChep(currentItems);
+        List<ItemData> result = saoChep(currentItems);
         result.removeIf(item -> item.maMon().equals(maMon));
         return result;
     }
 
     @Override
-    public int tinhTongSoLuong(List<HoaDonItemData> items) {
+    public int tinhTongSoLuong(List<ItemData> items) {
         int tong = 0;
         if (items == null) return tong;
 
-        for (HoaDonItemData item : items) {
+        for (ItemData item : items) {
             tong += item.soLuong();
         }
         return tong;
     }
 
     @Override
-    public double tinhTongTien(List<HoaDonItemData> items) {
+    public double tinhTongTien(List<ItemData> items) {
         double tong = 0;
         if (items == null) return tong;
 
-        for (HoaDonItemData item : items) {
+        for (ItemData item : items) {
             tong += item.thanhTien();
         }
         return tong;
@@ -330,44 +329,44 @@ public class HoaDonServiceImpl implements HoaDonService {
     private void validateHeader(NhanVien nhanVien,
                                 Ban ban,
                                 HoaDonStatus trangThai,
-                                List<HoaDonItemData> items) {
+                                List<ItemData> items) {
         if (nhanVien == null) {
-            throw new ServiceException("Không xác định được nhân viên đang đăng nhập.");
+            throw new IllegalArgumentException("Không xác định được nhân viên đang đăng nhập.");
         }
         if (ban == null) {
-            throw new ServiceException("Vui lòng chọn bàn.");
+            throw new IllegalArgumentException("Vui lòng chọn bàn.");
         }
         if (trangThai == null) {
-            throw new ServiceException("Vui lòng chọn trạng thái hóa đơn.");
+            throw new IllegalArgumentException("Vui lòng chọn trạng thái hóa đơn.");
         }
         if (items == null || items.isEmpty()) {
-            throw new ServiceException("Vui lòng thêm ít nhất một món ăn vào hóa đơn.");
+            throw new IllegalArgumentException("Vui lòng thêm ít nhất một món ăn vào hóa đơn.");
         }
     }
 
     private int parseSoLuong(String soLuongText) {
         if (soLuongText == null || soLuongText.isBlank()) {
-            throw new ServiceException("Vui lòng nhập số lượng.");
+            throw new IllegalArgumentException("Vui lòng nhập số lượng.");
         }
 
         try {
             int soLuong = Integer.parseInt(soLuongText.trim());
             if (soLuong <= 0) {
-                throw new ServiceException("Số lượng phải lớn hơn 0.");
+                throw new IllegalArgumentException("Số lượng phải lớn hơn 0.");
             }
             return soLuong;
         } catch (NumberFormatException ex) {
-            throw new ServiceException("Số lượng phải là số nguyên hợp lệ.");
+            throw new IllegalArgumentException("Số lượng phải là số nguyên hợp lệ.");
         }
     }
 
-    private List<ChiTietHD> taoDanhSachChiTietEntity(HoaDon hoaDon, List<HoaDonItemData> items) {
+    private List<ChiTietHD> taoDanhSachChiTietEntity(HoaDon hoaDon, List<ItemData> items) {
         List<ChiTietHD> result = new ArrayList<>();
 
-        for (HoaDonItemData item : items) {
+        for (ItemData item : items) {
             MonAn monAn = monAnDAO.findById(item.maMon());
             if (monAn == null) {
-                throw new ServiceException("Không tìm thấy món ăn với mã: " + item.maMon());
+                throw new IllegalArgumentException("Không tìm thấy món ăn với mã: " + item.maMon());
             }
 
             ChiTietHD chiTietHD = new ChiTietHD();
@@ -380,8 +379,8 @@ public class HoaDonServiceImpl implements HoaDonService {
         return result;
     }
 
-    private HoaDonItemData timItemTheoMaMon(List<HoaDonItemData> items, Long maMon) {
-        for (HoaDonItemData item : items) {
+    private ItemData timItemTheoMaMon(List<ItemData> items, Long maMon) {
+        for (ItemData item : items) {
             if (item.maMon().equals(maMon)) {
                 return item;
             }
@@ -389,7 +388,7 @@ public class HoaDonServiceImpl implements HoaDonService {
         return null;
     }
 
-    private List<HoaDonItemData> saoChep(List<HoaDonItemData> items) {
+    private List<ItemData> saoChep(List<ItemData> items) {
         return items == null ? new ArrayList<>() : new ArrayList<>(items);
     }
 
@@ -401,3 +400,4 @@ public class HoaDonServiceImpl implements HoaDonService {
         return dateTime == null ? "" : DATE_TIME_FORMATTER.format(dateTime);
     }
 }
+

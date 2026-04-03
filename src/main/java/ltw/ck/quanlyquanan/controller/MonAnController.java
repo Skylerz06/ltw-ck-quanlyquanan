@@ -3,7 +3,6 @@ package ltw.ck.quanlyquanan.controller;
 import ltw.ck.quanlyquanan.model.entity.LoaiMonAn;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.services.MonAnService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 import ltw.ck.quanlyquanan.services.impl.MonAnServiceImpl;
 import ltw.ck.quanlyquanan.view.MonAnPanel;
 
@@ -141,7 +140,7 @@ public class MonAnController {
             taiDanhSachMonAn();
             chonMonAnTheoId(monAn.getMaMon());
             JOptionPane.showMessageDialog(view, "Thêm món ăn thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể thêm món ăn", ex);
@@ -166,7 +165,7 @@ public class MonAnController {
             taiDanhSachMonAn();
             chonMonAnTheoId(maMon);
             JOptionPane.showMessageDialog(view, "Cập nhật món ăn thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể cập nhật món ăn", ex);
@@ -195,7 +194,7 @@ public class MonAnController {
             monAnService.delete(maMon);
             taiDanhSachMonAn();
             JOptionPane.showMessageDialog(view, "Xóa món ăn thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể xóa món ăn. Món ăn này có thể đang được tham chiếu bởi dữ liệu khác", ex);

@@ -6,8 +6,7 @@ import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
 import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
-import ltw.ck.quanlyquanan.services.ServiceException;
-import ltw.ck.quanlyquanan.services.ThongKeResult;
+import ltw.ck.quanlyquanan.services.ThongKeService.Result;
 import ltw.ck.quanlyquanan.services.ThongKeService;
 
 import java.time.Instant;
@@ -34,7 +33,7 @@ public class ThongKeServiceImpl implements ThongKeService {
     }
 
     @Override
-    public ThongKeResult thongKe(Date tuNgayDate, Date denNgayDate) {
+    public Result thongKe(Date tuNgayDate, Date denNgayDate) {
         DateRange range = layKhoangNgay(tuNgayDate, denNgayDate);
         List<HoaDon> danhSachHoaDon = new ArrayList<>(
                 hoaDonDAO.findByKhoangNgay(range.from(), range.to())
@@ -43,19 +42,19 @@ public class ThongKeServiceImpl implements ThongKeService {
         HoaDonStatsDto hoaDonStats = tinhThongKeHoaDon(danhSachHoaDon);
         List<MonAnStatsDto> monAnStats = tinhThongKeMonAn(danhSachHoaDon);
 
-        return new ThongKeResult(hoaDonStats, danhSachHoaDon, monAnStats);
+        return new Result(hoaDonStats, danhSachHoaDon, monAnStats);
     }
 
     private DateRange layKhoangNgay(Date tuNgayDate, Date denNgayDate) {
         if (tuNgayDate == null || denNgayDate == null) {
-            throw new ServiceException("Vui lòng chọn đầy đủ từ ngày và đến ngày.");
+            throw new IllegalArgumentException("Vui lòng chọn đầy đủ từ ngày và đến ngày.");
         }
 
         LocalDate tuNgay = chuyenDate(tuNgayDate);
         LocalDate denNgay = chuyenDate(denNgayDate);
 
         if (tuNgay.isAfter(denNgay)) {
-            throw new ServiceException("Từ ngày không được lớn hơn đến ngày.");
+            throw new IllegalArgumentException("Từ ngày không được lớn hơn đến ngày.");
         }
 
         return new DateRange(tuNgay.atStartOfDay(), denNgay.atTime(23, 59, 59));
@@ -129,3 +128,4 @@ public class ThongKeServiceImpl implements ThongKeService {
     private record DateRange(LocalDateTime from, LocalDateTime to) {
     }
 }
+

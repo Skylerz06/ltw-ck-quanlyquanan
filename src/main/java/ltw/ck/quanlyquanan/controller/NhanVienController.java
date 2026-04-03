@@ -3,7 +3,6 @@ package ltw.ck.quanlyquanan.controller;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
 import ltw.ck.quanlyquanan.services.NhanVienService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 import ltw.ck.quanlyquanan.services.impl.NhanVienServiceImpl;
 import ltw.ck.quanlyquanan.view.NhanVienPanel;
 
@@ -83,7 +82,7 @@ public class NhanVienController {
             taiDanhSachNhanVien();
             chonNhanVienTheoId(nhanVien.getMaNV());
             JOptionPane.showMessageDialog(view, "Thêm nhân viên thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể thêm nhân viên", ex);
@@ -110,7 +109,7 @@ public class NhanVienController {
             taiDanhSachNhanVien();
             chonNhanVienTheoId(maNV);
             JOptionPane.showMessageDialog(view, "Cập nhật nhân viên thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể cập nhật nhân viên", ex);

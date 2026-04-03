@@ -25,22 +25,33 @@ public interface HoaDonService {
                   NhanVien nhanVien,
                   Ban ban,
                   HoaDonStatus trangThai,
-                  List<HoaDonItemData> items);
+                  List<ItemData> items);
 
     HoaDon update(Long maHd,
                   KhachHang khachHang,
                   NhanVien nhanVien,
                   Ban ban,
                   HoaDonStatus trangThai,
-                  List<HoaDonItemData> items);
+                  List<ItemData> items);
 
-    List<HoaDonItemData> toItemDataList(HoaDon hoaDon);
+    List<ItemData> toItemDataList(HoaDon hoaDon);
 
-    List<HoaDonItemData> addItem(List<HoaDonItemData> currentItems, MonAn monAn, String soLuongText);
-    List<HoaDonItemData> updateItem(List<HoaDonItemData> currentItems, Long maMonCu, MonAn monAnMoi, String soLuongText);
-    List<HoaDonItemData> removeItem(List<HoaDonItemData> currentItems, Long maMon);
+    List<ItemData> addItem(List<ItemData> currentItems, MonAn monAn, String soLuongText);
+    List<ItemData> updateItem(List<ItemData> currentItems, Long maMonCu, MonAn monAnMoi, String soLuongText);
+    List<ItemData> removeItem(List<ItemData> currentItems, Long maMon);
 
-    int tinhTongSoLuong(List<HoaDonItemData> items);
-    double tinhTongTien(List<HoaDonItemData> items);
+    int tinhTongSoLuong(List<ItemData> items);
+    double tinhTongTien(List<ItemData> items);
     double tinhTongTienHoaDon(HoaDon hoaDon);
+
+    record ItemData(
+            Long maMon,
+            String tenMon,
+            Double donGia,
+            int soLuong
+    ) {
+        public double thanhTien() {
+            return (donGia == null ? 0 : donGia) * soLuong;
+        }
+    }
 }

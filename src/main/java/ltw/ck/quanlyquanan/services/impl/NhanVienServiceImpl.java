@@ -7,7 +7,6 @@ import ltw.ck.quanlyquanan.model.dao.impl.TaiKhoanDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
 import ltw.ck.quanlyquanan.services.NhanVienService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +84,7 @@ public class NhanVienServiceImpl implements NhanVienService {
                            String tenDangNhap, String matKhau) {
         NhanVien nhanVien = nhanVienDAO.findById(maNV);
         if (nhanVien == null) {
-            throw new ServiceException("Không tìm thấy nhân viên cần cập nhật.");
+            throw new IllegalArgumentException("Không tìm thấy nhân viên cần cập nhật.");
         }
 
         validate(true, nhanVien, hoTen, sdt, tenDangNhap, matKhau);
@@ -128,15 +127,15 @@ public class NhanVienServiceImpl implements NhanVienService {
     private void validate(boolean isUpdate, NhanVien nhanVienHienTai,
                           String hoTen, String sdt, String tenDangNhap, String matKhau) {
         if (isBlank(hoTen)) {
-            throw new ServiceException("Vui lòng nhập họ tên nhân viên.");
+            throw new IllegalArgumentException("Vui lòng nhập họ tên nhân viên.");
         }
 
         if (isBlank(sdt)) {
-            throw new ServiceException("Vui lòng nhập số điện thoại.");
+            throw new IllegalArgumentException("Vui lòng nhập số điện thoại.");
         }
 
         if (!sdt.trim().matches("\\d{9,15}")) {
-            throw new ServiceException("Số điện thoại chỉ được chứa 9 đến 15 chữ số.");
+            throw new IllegalArgumentException("Số điện thoại chỉ được chứa 9 đến 15 chữ số.");
         }
 
         NhanVien nhanVienTheoSdt = nhanVienDAO.findBySdt(sdt.trim());
@@ -145,7 +144,7 @@ public class NhanVienServiceImpl implements NhanVienService {
                     && nhanVienHienTai != null
                     && nhanVienTheoSdt.getMaNV().equals(nhanVienHienTai.getMaNV());
             if (!isSameNhanVien) {
-                throw new ServiceException("Số điện thoại đã tồn tại.");
+                throw new IllegalArgumentException("Số điện thoại đã tồn tại.");
             }
         }
 
@@ -153,11 +152,11 @@ public class NhanVienServiceImpl implements NhanVienService {
         boolean coNhapMatKhau = !isBlank(matKhau);
 
         if (!isUpdate && (!coNhapTenDangNhap || !coNhapMatKhau)) {
-            throw new ServiceException("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
+            throw new IllegalArgumentException("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
         }
 
         if (isUpdate && (coNhapTenDangNhap != coNhapMatKhau)) {
-            throw new ServiceException("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
+            throw new IllegalArgumentException("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
         }
 
         if (!coNhapTenDangNhap) {
@@ -172,7 +171,7 @@ public class NhanVienServiceImpl implements NhanVienService {
                     && taiKhoanTheoTenDangNhap.getMaTK().equals(nhanVienHienTai.getTaiKhoan().getMaTK());
 
             if (!isSameTaiKhoan) {
-                throw new ServiceException("Tên đăng nhập đã tồn tại.");
+                throw new IllegalArgumentException("Tên đăng nhập đã tồn tại.");
             }
         }
     }

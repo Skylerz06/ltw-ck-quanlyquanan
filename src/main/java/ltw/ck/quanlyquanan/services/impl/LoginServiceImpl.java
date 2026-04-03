@@ -4,7 +4,6 @@ import ltw.ck.quanlyquanan.model.dao.TaiKhoanDAO;
 import ltw.ck.quanlyquanan.model.dao.impl.TaiKhoanDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
 import ltw.ck.quanlyquanan.services.LoginService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 
 public class LoginServiceImpl implements LoginService {
 
@@ -21,16 +20,16 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public TaiKhoan login(String tenDangNhap, String matKhau) {
         if (tenDangNhap == null || tenDangNhap.isBlank()) {
-            throw new ServiceException("Vui lòng nhập tên đăng nhập.");
+            throw new IllegalArgumentException("Vui lòng nhập tên đăng nhập.");
         }
 
         if (matKhau == null || matKhau.isBlank()) {
-            throw new ServiceException("Vui lòng nhập mật khẩu.");
+            throw new IllegalArgumentException("Vui lòng nhập mật khẩu.");
         }
 
         TaiKhoan taiKhoan = taiKhoanDAO.checkLogin(tenDangNhap.trim(), matKhau);
         if (taiKhoan == null) {
-            throw new ServiceException("Sai tên đăng nhập hoặc mật khẩu.");
+            throw new IllegalArgumentException("Sai tên đăng nhập hoặc mật khẩu.");
         }
 
         return taiKhoan;

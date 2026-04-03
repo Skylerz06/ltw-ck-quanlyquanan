@@ -7,7 +7,6 @@ import ltw.ck.quanlyquanan.model.dao.impl.MonAnDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.LoaiMonAn;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.services.MonAnService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,12 +82,12 @@ public class MonAnServiceImpl implements MonAnService {
     @Override
     public MonAn update(Long maMon, String tenMon, String donGiaText, LoaiMonAn loaiMonAn) {
         if (maMon == null) {
-            throw new ServiceException("Vui lòng chọn món ăn cần cập nhật.");
+            throw new IllegalArgumentException("Vui lòng chọn món ăn cần cập nhật.");
         }
 
         MonAn monAn = monAnDAO.findById(maMon);
         if (monAn == null) {
-            throw new ServiceException("Không tìm thấy món ăn cần cập nhật.");
+            throw new IllegalArgumentException("Không tìm thấy món ăn cần cập nhật.");
         }
 
         FormData formData = validate(true, monAn, tenMon, donGiaText, loaiMonAn);
@@ -104,7 +103,7 @@ public class MonAnServiceImpl implements MonAnService {
     @Override
     public void delete(Long maMon) {
         if (maMon == null) {
-            throw new ServiceException("Vui lòng chọn món ăn cần xóa.");
+            throw new IllegalArgumentException("Vui lòng chọn món ăn cần xóa.");
         }
         monAnDAO.delete(maMon);
     }
@@ -112,26 +111,26 @@ public class MonAnServiceImpl implements MonAnService {
     private FormData validate(boolean isUpdate, MonAn monAnHienTai,
                               String tenMon, String donGiaText, LoaiMonAn loaiMonAn) {
         if (tenMon == null || tenMon.isBlank()) {
-            throw new ServiceException("Vui lòng nhập tên món ăn.");
+            throw new IllegalArgumentException("Vui lòng nhập tên món ăn.");
         }
 
         if (donGiaText == null || donGiaText.isBlank()) {
-            throw new ServiceException("Vui lòng nhập đơn giá.");
+            throw new IllegalArgumentException("Vui lòng nhập đơn giá.");
         }
 
         Double donGia;
         try {
             donGia = Double.parseDouble(donGiaText.trim());
         } catch (NumberFormatException ex) {
-            throw new ServiceException("Đơn giá phải là số hợp lệ.");
+            throw new IllegalArgumentException("Đơn giá phải là số hợp lệ.");
         }
 
         if (donGia <= 0) {
-            throw new ServiceException("Đơn giá phải lớn hơn 0.");
+            throw new IllegalArgumentException("Đơn giá phải lớn hơn 0.");
         }
 
         if (loaiMonAn == null) {
-            throw new ServiceException("Vui lòng chọn loại món ăn.");
+            throw new IllegalArgumentException("Vui lòng chọn loại món ăn.");
         }
 
         List<MonAn> monAnCungTen = monAnDAO.findByTenMon(tenMon.trim());
@@ -141,7 +140,7 @@ public class MonAnServiceImpl implements MonAnService {
                     && item.getMaMon().equals(monAnHienTai.getMaMon());
 
             if (!isSameMonAn && item.getTenMon().equalsIgnoreCase(tenMon.trim())) {
-                throw new ServiceException("Tên món ăn đã tồn tại.");
+                throw new IllegalArgumentException("Tên món ăn đã tồn tại.");
             }
         }
 

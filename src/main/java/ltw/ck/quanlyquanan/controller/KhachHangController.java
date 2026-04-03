@@ -3,7 +3,6 @@ package ltw.ck.quanlyquanan.controller;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
 import ltw.ck.quanlyquanan.model.entity.LoaiKH;
 import ltw.ck.quanlyquanan.services.KhachHangService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 import ltw.ck.quanlyquanan.services.impl.KhachHangServiceImpl;
 import ltw.ck.quanlyquanan.view.KhachHangPanel;
 
@@ -140,7 +139,7 @@ public class KhachHangController {
             taiDanhSachKhachHang();
             chonKhachHangTheoId(khachHang.getMaKh());
             JOptionPane.showMessageDialog(view, "Thêm khách hàng thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể thêm khách hàng", ex);
@@ -164,7 +163,7 @@ public class KhachHangController {
             taiDanhSachKhachHang();
             chonKhachHangTheoId(maKH);
             JOptionPane.showMessageDialog(view, "Cập nhật khách hàng thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể cập nhật khách hàng", ex);
@@ -193,7 +192,7 @@ public class KhachHangController {
             khachHangService.delete(maKH);
             taiDanhSachKhachHang();
             JOptionPane.showMessageDialog(view, "Xóa khách hàng thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể xóa khách hàng. Khách hàng này có thể đang được tham chiếu bởi dữ liệu khác", ex);

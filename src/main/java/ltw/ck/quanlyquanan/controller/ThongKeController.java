@@ -4,8 +4,7 @@ import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
 import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
-import ltw.ck.quanlyquanan.services.ServiceException;
-import ltw.ck.quanlyquanan.services.ThongKeResult;
+import ltw.ck.quanlyquanan.services.ThongKeService.Result;
 import ltw.ck.quanlyquanan.services.ThongKeService;
 import ltw.ck.quanlyquanan.services.impl.ThongKeServiceImpl;
 import ltw.ck.quanlyquanan.view.ThongKePanel;
@@ -50,14 +49,14 @@ public class ThongKeController {
 
     private void thongKe() {
         try {
-            ThongKeResult result = thongKeService.thongKe(
+            Result result = thongKeService.thongKe(
                     (java.util.Date) view.getSpnTuNgay().getValue(),
                     (java.util.Date) view.getSpnDenNgay().getValue()
             );
 
             hienThiThongKeHoaDon(result.hoaDonStats(), result.danhSachHoaDon());
             hienThiThongKeMonAn(result.monAnStats());
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(
                     view,
                     ex.getMessage(),
@@ -146,3 +145,4 @@ public class ThongKeController {
         view.setVisible(true);
     }
 }
+

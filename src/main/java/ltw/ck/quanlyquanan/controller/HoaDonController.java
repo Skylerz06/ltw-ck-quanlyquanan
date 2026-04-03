@@ -8,9 +8,8 @@ import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
 import ltw.ck.quanlyquanan.services.AppSession;
-import ltw.ck.quanlyquanan.services.HoaDonItemData;
+import ltw.ck.quanlyquanan.services.HoaDonService.ItemData;
 import ltw.ck.quanlyquanan.services.HoaDonService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 import ltw.ck.quanlyquanan.services.impl.HoaDonServiceImpl;
 import ltw.ck.quanlyquanan.view.HoaDonPanel;
 
@@ -38,7 +37,7 @@ public class HoaDonController {
     private List<NhanVien> danhSachNhanVien = new ArrayList<>();
     private List<Ban> danhSachBan = new ArrayList<>();
     private List<MonAn> danhSachMonAn = new ArrayList<>();
-    private List<HoaDonItemData> chiTietTam = new ArrayList<>();
+    private List<ItemData> chiTietTam = new ArrayList<>();
 
     private HoaDon hoaDonDangChon;
     private NhanVien nhanVienDangNhap;
@@ -232,7 +231,7 @@ public class HoaDonController {
 
         int modelRow = view.getTblChiTietForm().convertRowIndexToModel(selectedRow);
         Long maMon = (Long) view.getChiTietFormTableModel().getValueAt(modelRow, 0);
-        HoaDonItemData item = timChiTietTamTheoMaMon(maMon);
+        ItemData item = timChiTietTamTheoMaMon(maMon);
         if (item == null) {
             capNhatTrangThaiNutMon(false);
             return;
@@ -247,7 +246,7 @@ public class HoaDonController {
         DefaultTableModel tableModel = view.getChiTietFormTableModel();
         tableModel.setRowCount(0);
 
-        for (HoaDonItemData item : chiTietTam) {
+        for (ItemData item : chiTietTam) {
             tableModel.addRow(new Object[]{
                     item.maMon(),
                     item.tenMon(),
@@ -260,11 +259,11 @@ public class HoaDonController {
         view.getLblTongTienForm().setText("Tổng tiền: " + formatMoney(hoaDonService.tinhTongTien(chiTietTam)) + " đ");
     }
 
-    private void doDuLieuChiTietLichSuLenBang(List<HoaDonItemData> items) {
+    private void doDuLieuChiTietLichSuLenBang(List<ItemData> items) {
         DefaultTableModel tableModel = view.getChiTietLichSuTableModel();
         tableModel.setRowCount(0);
 
-        for (HoaDonItemData item : items) {
+        for (ItemData item : items) {
             tableModel.addRow(new Object[]{
                     item.maMon(),
                     item.tenMon(),
@@ -292,7 +291,7 @@ public class HoaDonController {
             doDuLieuChiTietFormLenBang();
             view.clearMonAnForm();
             capNhatTrangThaiNutMon(false);
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -321,7 +320,7 @@ public class HoaDonController {
                 chonChiTietTheoMaMon(monAnMoi.getMaMon());
             }
             capNhatTrangThaiNutMon(true);
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -341,7 +340,7 @@ public class HoaDonController {
             doDuLieuChiTietFormLenBang();
             view.clearMonAnForm();
             capNhatTrangThaiNutMon(false);
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -373,7 +372,7 @@ public class HoaDonController {
             view.clearMonAnForm();
 
             JOptionPane.showMessageDialog(view, "Lập hóa đơn thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể lập hóa đơn", ex);
@@ -410,7 +409,7 @@ public class HoaDonController {
             view.clearMonAnForm();
 
             JOptionPane.showMessageDialog(view, "Cập nhật hóa đơn thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể cập nhật hóa đơn", ex);
@@ -457,7 +456,7 @@ public class HoaDonController {
             }
 
             JOptionPane.showMessageDialog(view, "Xóa hóa đơn thành công.");
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage(), "Dữ liệu chưa hợp lệ", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ex) {
             hienThiLoi("Không thể xóa hóa đơn", ex);
@@ -549,8 +548,8 @@ public class HoaDonController {
         return null;
     }
 
-    private HoaDonItemData timChiTietTamTheoMaMon(Long maMon) {
-        for (HoaDonItemData item : chiTietTam) {
+    private ItemData timChiTietTamTheoMaMon(Long maMon) {
+        for (ItemData item : chiTietTam) {
             if (item.maMon().equals(maMon)) {
                 return item;
             }
@@ -627,3 +626,4 @@ public class HoaDonController {
         }
     }
 }
+

@@ -3,7 +3,6 @@ package ltw.ck.quanlyquanan.controller;
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
 import ltw.ck.quanlyquanan.services.AppSession;
 import ltw.ck.quanlyquanan.services.LoginService;
-import ltw.ck.quanlyquanan.services.ServiceException;
 import ltw.ck.quanlyquanan.services.impl.LoginServiceImpl;
 import ltw.ck.quanlyquanan.view.LoginFrame;
 import ltw.ck.quanlyquanan.view.MainFrame;
@@ -59,7 +58,7 @@ public class LoginController {
 
             view.dispose();
 
-        } catch (ServiceException ex) {
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(view, ex.getMessage());
 
             if ("Vui lòng nhập tên đăng nhập.".equals(ex.getMessage())) {
