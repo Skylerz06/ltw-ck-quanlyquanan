@@ -1,7 +1,7 @@
 package ltw.ck.quanlyquanan.controller;
 
 import ltw.ck.quanlyquanan.model.entity.TaiKhoan;
-import ltw.ck.quanlyquanan.services.AppSession;
+import ltw.ck.quanlyquanan.session.AppSession;
 import ltw.ck.quanlyquanan.services.LoginService;
 import ltw.ck.quanlyquanan.services.impl.LoginServiceImpl;
 import ltw.ck.quanlyquanan.view.LoginFrame;

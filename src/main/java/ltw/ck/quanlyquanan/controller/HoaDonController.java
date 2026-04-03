@@ -4,10 +4,11 @@ import ltw.ck.quanlyquanan.model.dto.ChiTietHDDto;
 import ltw.ck.quanlyquanan.model.entity.Ban;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
+import ltw.ck.quanlyquanan.model.entity.LoaiMonAn;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
-import ltw.ck.quanlyquanan.services.AppSession;
+import ltw.ck.quanlyquanan.session.AppSession;
 import ltw.ck.quanlyquanan.services.HoaDonService;
 import ltw.ck.quanlyquanan.services.HoaDonService.DanhMucData;
 import ltw.ck.quanlyquanan.services.HoaDonService.FormData;
@@ -23,7 +24,10 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class HoaDonController {
@@ -37,6 +41,7 @@ public class HoaDonController {
 
     private List<HoaDon> danhSachHoaDon = new ArrayList<>();
     private List<ItemData> chiTietTam = new ArrayList<>();
+    private List<MonAn> tatCaMonAn = new ArrayList<>();
 
     private HoaDon hoaDonDangChon;
     private NhanVien nhanVienDangNhap;
@@ -77,6 +82,7 @@ public class HoaDonController {
         view.getBtnXoaMon().addActionListener(e -> xoaMonKhoiHoaDon());
 
         view.getTxtTimKiem().addActionListener(e -> timKiemHoaDon());
+        view.getCboLocLoaiMonAn().addActionListener(e -> apDungBoLocMonAn());
         view.getTblHoaDon().getSelectionModel().addListSelectionListener(this::xuLyChonHoaDonLichSu);
         view.getTblChiTietForm().getSelectionModel().addListSelectionListener(this::xuLyChonChiTietForm);
     }
@@ -95,14 +101,12 @@ public class HoaDonController {
 
     private void taiKhachHang(List<KhachHang> khachHangs) {
         DefaultComboBoxModel<KhachHang> model = new DefaultComboBoxModel<>();
-        model.addElement(null);
         for (KhachHang khachHang : khachHangs) {
             model.addElement(khachHang);
         }
         view.getCboKhachHang().setModel(model);
         view.getCboKhachHang().setSelectedItem(null);
         view.setTenKhachHangNhap("");
-        view.getCboKhachHang().setRenderer(new NullableObjectRenderer("Khách lẻ"));
     }
 
     private void taiNhanVien(List<NhanVien> nhanViens) {
@@ -134,12 +138,54 @@ public class HoaDonController {
     }
 
     private void taiMonAn(List<MonAn> monAns) {
-        DefaultComboBoxModel<MonAn> model = new DefaultComboBoxModel<>();
+        tatCaMonAn = new ArrayList<>(monAns);
+        taiLoaiMonAnLoc(monAns);
+        apDungBoLocMonAn();
+    }
+
+    private void taiLoaiMonAnLoc(List<MonAn> monAns) {
+        Map<Long, LoaiMonAn> loaiTheoId = new LinkedHashMap<>();
         for (MonAn monAn : monAns) {
-            model.addElement(monAn);
+            if (monAn.getLoaiMonAn() != null) {
+                loaiTheoId.putIfAbsent(monAn.getLoaiMonAn().getMaLoai(), monAn.getLoaiMonAn());
+            }
         }
+
+        List<LoaiMonAn> danhSachLoaiMonAn = new ArrayList<>(loaiTheoId.values());
+        danhSachLoaiMonAn.sort(Comparator.comparing(LoaiMonAn::getTenLoai, String.CASE_INSENSITIVE_ORDER));
+
+        DefaultComboBoxModel<LoaiMonAn> model = new DefaultComboBoxModel<>();
+        model.addElement(null);
+        for (LoaiMonAn loaiMonAn : danhSachLoaiMonAn) {
+            model.addElement(loaiMonAn);
+        }
+        view.getCboLocLoaiMonAn().setModel(model);
+        view.getCboLocLoaiMonAn().setRenderer(new NullableObjectRenderer("Tất cả loại"));
+        view.getCboLocLoaiMonAn().setSelectedItem(null);
+    }
+
+    private void apDungBoLocMonAn() {
+        MonAn monDangChon = view.getMonAnDangChon();
+        LoaiMonAn loaiDangChon = view.getLoaiMonAnLocDangChon();
+
+        DefaultComboBoxModel<MonAn> model = new DefaultComboBoxModel<>();
+        for (MonAn monAn : tatCaMonAn) {
+            boolean khopLoai = loaiDangChon == null
+                    || (monAn.getLoaiMonAn() != null
+                    && loaiDangChon.getMaLoai().equals(monAn.getLoaiMonAn().getMaLoai()));
+
+            if (khopLoai) {
+                model.addElement(monAn);
+            }
+        }
+
         view.getCboMonAn().setModel(model);
-        view.getCboMonAn().setSelectedItem(null);
+
+        if (monDangChon != null) {
+            selectComboItemById(view.getCboMonAn(), monDangChon.getMaMon(), MonAn::getMaMon);
+        } else {
+            view.getCboMonAn().setSelectedItem(null);
+        }
     }
 
     private void taiDanhSachHoaDon() {
@@ -232,6 +278,11 @@ public class HoaDonController {
         if (item == null) {
             capNhatTrangThaiNutMon(false);
             return;
+        }
+
+        if (!comboContainsMonAn(item.maMon())) {
+            view.clearBoLocMonAn();
+            apDungBoLocMonAn();
         }
 
         selectComboItemById(view.getCboMonAn(), item.maMon(), MonAn::getMaMon);
@@ -495,6 +546,7 @@ public class HoaDonController {
         chiTietTam = new ArrayList<>();
         hoaDonDangChon = null;
         view.clearHoaDonForm();
+        apDungBoLocMonAn();
         doDuLieuChiTietFormLenBang();
         view.setNgayLap(formatDateTime(LocalDateTime.now()));
         view.setTrangThai(HoaDonStatus.CREATED);
@@ -523,6 +575,17 @@ public class HoaDonController {
                 return;
             }
         }
+    }
+
+    private boolean comboContainsMonAn(Long maMon) {
+        ComboBoxModel<MonAn> model = view.getCboMonAn().getModel();
+        for (int i = 0; i < model.getSize(); i++) {
+            MonAn item = model.getElementAt(i);
+            if (item != null && maMon.equals(item.getMaMon())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private <T, ID> void selectComboItemById(JComboBox<T> comboBox, ID id, Function<T, ID> idExtractor) {
