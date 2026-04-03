@@ -1,21 +1,23 @@
 package ltw.ck.quanlyquanan.services.impl;
 
 import ltw.ck.quanlyquanan.model.dto.ChiTietHDDto;
-
 import ltw.ck.quanlyquanan.model.dao.BanDAO;
 import ltw.ck.quanlyquanan.model.dao.HoaDonDAO;
 import ltw.ck.quanlyquanan.model.dao.KhachHangDAO;
+import ltw.ck.quanlyquanan.model.dao.LoaiKhachHangDAO;
 import ltw.ck.quanlyquanan.model.dao.MonAnDAO;
 import ltw.ck.quanlyquanan.model.dao.NhanVienDAO;
 import ltw.ck.quanlyquanan.model.dao.impl.BanDAOImpl;
 import ltw.ck.quanlyquanan.model.dao.impl.HoaDonDAOImpl;
 import ltw.ck.quanlyquanan.model.dao.impl.KhachHangDAOImpl;
+import ltw.ck.quanlyquanan.model.dao.impl.LoaiKhachHangDAOImpl;
 import ltw.ck.quanlyquanan.model.dao.impl.MonAnDAOImpl;
 import ltw.ck.quanlyquanan.model.dao.impl.NhanVienDAOImpl;
 import ltw.ck.quanlyquanan.model.entity.Ban;
 import ltw.ck.quanlyquanan.model.entity.ChiTietHD;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
+import ltw.ck.quanlyquanan.model.entity.LoaiKH;
 import ltw.ck.quanlyquanan.model.entity.MonAn;
 import ltw.ck.quanlyquanan.model.entity.NhanVien;
 import ltw.ck.quanlyquanan.model.enums.HoaDonStatus;
@@ -35,6 +37,7 @@ public class HoaDonServiceImpl implements HoaDonService {
 
     private final HoaDonDAO hoaDonDAO;
     private final KhachHangDAO khachHangDAO;
+    private final LoaiKhachHangDAO loaiKhachHangDAO;
     private final NhanVienDAO nhanVienDAO;
     private final BanDAO banDAO;
     private final MonAnDAO monAnDAO;
@@ -43,6 +46,7 @@ public class HoaDonServiceImpl implements HoaDonService {
         this(
                 new HoaDonDAOImpl(),
                 new KhachHangDAOImpl(),
+                new LoaiKhachHangDAOImpl(),
                 new NhanVienDAOImpl(),
                 new BanDAOImpl(),
                 new MonAnDAOImpl()
@@ -51,11 +55,13 @@ public class HoaDonServiceImpl implements HoaDonService {
 
     public HoaDonServiceImpl(HoaDonDAO hoaDonDAO,
                              KhachHangDAO khachHangDAO,
+                             LoaiKhachHangDAO loaiKhachHangDAO,
                              NhanVienDAO nhanVienDAO,
                              BanDAO banDAO,
                              MonAnDAO monAnDAO) {
         this.hoaDonDAO = hoaDonDAO;
         this.khachHangDAO = khachHangDAO;
+        this.loaiKhachHangDAO = loaiKhachHangDAO;
         this.nhanVienDAO = nhanVienDAO;
         this.banDAO = banDAO;
         this.monAnDAO = monAnDAO;
@@ -172,6 +178,31 @@ public class HoaDonServiceImpl implements HoaDonService {
 
         hoaDonDAO.update(hoaDon);
         return hoaDonDAO.findById(maHd);
+    }
+
+    @Override
+    public KhachHang resolveKhachHang(KhachHang khachHangDangChon, String tenKhachHangNhap) {
+        String tenKhachHang = normalizeText(tenKhachHangNhap);
+        if (tenKhachHang.isEmpty()) {
+            return null;
+        }
+
+        if (khachHangDangChon != null
+                && tenKhachHang.equalsIgnoreCase(normalizeText(khachHangDangChon.getTenKh()))) {
+            return khachHangDangChon;
+        }
+
+        KhachHang khachHangTonTai = timKhachHangTheoTenChinhXac(tenKhachHang);
+        if (khachHangTonTai != null) {
+            return khachHangTonTai;
+        }
+
+        LoaiKH loaiKhachHangMacDinh = layLoaiKhachHangMacDinh();
+        KhachHang khachHangMoi = new KhachHang();
+        khachHangMoi.setTenKh(tenKhachHang);
+        khachHangMoi.setLoaiKhachHang(loaiKhachHangMacDinh);
+        khachHangDAO.save(khachHangMoi);
+        return khachHangMoi;
     }
 
     @Override
@@ -440,6 +471,25 @@ public class HoaDonServiceImpl implements HoaDonService {
         return result;
     }
 
+    private KhachHang timKhachHangTheoTenChinhXac(String tenKhachHang) {
+        for (KhachHang khachHang : khachHangDAO.findByTenKh(tenKhachHang)) {
+            if (tenKhachHang.equalsIgnoreCase(normalizeText(khachHang.getTenKh()))) {
+                return khachHang;
+            }
+        }
+        return null;
+    }
+
+    private LoaiKH layLoaiKhachHangMacDinh() {
+        List<LoaiKH> loaiKhs = loaiKhachHangDAO.findAll();
+        if (loaiKhs.isEmpty()) {
+            throw new IllegalStateException(
+                    "Không thể tạo khách hàng mới vì chưa có loại khách hàng nào trong hệ thống."
+            );
+        }
+        return loaiKhs.get(0);
+    }
+
     private ItemData timItemTheoMaMon(List<ItemData> items, Long maMon) {
         for (ItemData item : items) {
             if (item.maMon().equals(maMon)) {
@@ -453,6 +503,10 @@ public class HoaDonServiceImpl implements HoaDonService {
         return items == null ? new ArrayList<>() : new ArrayList<>(items);
     }
 
+    private String normalizeText(String value) {
+        return value == null ? "" : value.trim();
+    }
+
     private String safeLower(String value) {
         return value == null ? "" : value.toLowerCase(Locale.ROOT);
     }
@@ -461,5 +515,3 @@ public class HoaDonServiceImpl implements HoaDonService {
         return dateTime == null ? "" : DATE_TIME_FORMATTER.format(dateTime);
     }
 }
-
-

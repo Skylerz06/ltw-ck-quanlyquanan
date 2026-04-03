@@ -1,9 +1,11 @@
 package ltw.ck.quanlyquanan.controller;
 
+import ltw.ck.quanlyquanan.model.dto.BanStatsDto;
+import ltw.ck.quanlyquanan.model.dto.HoaDonRowDto;
 import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
+import ltw.ck.quanlyquanan.model.dto.KhachHangStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
 import ltw.ck.quanlyquanan.services.ThongKeService;
-import ltw.ck.quanlyquanan.services.ThongKeService.HoaDonRow;
 import ltw.ck.quanlyquanan.services.ThongKeService.Result;
 import ltw.ck.quanlyquanan.services.impl.ThongKeServiceImpl;
 import ltw.ck.quanlyquanan.view.ThongKePanel;
@@ -42,6 +44,8 @@ public class ThongKeController {
     private void registerEvents() {
         view.getBtnTabTongQuan().addActionListener(e -> view.showCard(ThongKePanel.CARD_TONG_QUAN));
         view.getBtnTabMonAn().addActionListener(e -> view.showCard(ThongKePanel.CARD_MON_AN));
+        view.getBtnTabBan().addActionListener(e -> view.showCard(ThongKePanel.CARD_BAN));
+        view.getBtnTabKhachHang().addActionListener(e -> view.showCard(ThongKePanel.CARD_KHACH_HANG));
         view.getBtnThongKe().addActionListener(e -> thongKe());
         view.getBtnLamMoi().addActionListener(e -> lamMoiBoLoc());
     }
@@ -55,6 +59,8 @@ public class ThongKeController {
 
             hienThiThongKeHoaDon(result.hoaDonStats(), result.hoaDonRows());
             hienThiThongKeMonAn(result.monAnStats());
+            hienThiThongKeTheoBan(result.banRows());
+            hienThiThongKeTheoKhachHang(result.khachHangRows());
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(
                     view,
@@ -67,7 +73,7 @@ public class ThongKeController {
         }
     }
 
-    private void hienThiThongKeHoaDon(HoaDonStatsDto stats, List<HoaDonRow> rows) {
+    private void hienThiThongKeHoaDon(HoaDonStatsDto stats, List<HoaDonRowDto> rows) {
         view.getLblTongHoaDon().setText(String.valueOf(stats.getTotalHoaDon()));
         view.getLblTongDoanhThu().setText(MONEY_FORMAT.format(stats.getTongDoanhThu()) + " đ");
         view.getLblHoaDonHomNay().setText(String.valueOf(stats.getHoaDonHomNay()));
@@ -75,15 +81,15 @@ public class ThongKeController {
         DefaultTableModel tableModel = view.getHoaDonTableModel();
         tableModel.setRowCount(0);
 
-        for (HoaDonRow row : rows) {
+        for (HoaDonRowDto row : rows) {
             tableModel.addRow(new Object[]{
-                    row.maHd(),
-                    formatDateTime(row.ngayLap()),
-                    row.tenKhachHang(),
-                    row.tenNhanVien(),
-                    row.tenBan(),
-                    row.tongSoLuong(),
-                    MONEY_FORMAT.format(row.tongTien())
+                    row.getMaHd(),
+                    formatDateTime(row.getNgayLap()),
+                    row.getTenKhachHang(),
+                    row.getTenNhanVien(),
+                    row.getTenBan(),
+                    row.getTongSoLuong(),
+                    MONEY_FORMAT.format(row.getTongTien())
             });
         }
     }
@@ -98,6 +104,34 @@ public class ThongKeController {
                     top++,
                     statsDto.getTenMon(),
                     statsDto.getSoLuongBan()
+            });
+        }
+    }
+
+    private void hienThiThongKeTheoBan(List<BanStatsDto> rows) {
+        DefaultTableModel tableModel = view.getBanTableModel();
+        tableModel.setRowCount(0);
+
+        for (BanStatsDto row : rows) {
+            tableModel.addRow(new Object[]{
+                    row.getTenBan(),
+                    row.getSoHoaDon(),
+                    row.getTongSoLuong(),
+                    MONEY_FORMAT.format(row.getTongDoanhThu())
+            });
+        }
+    }
+
+    private void hienThiThongKeTheoKhachHang(List<KhachHangStatsDto> rows) {
+        DefaultTableModel tableModel = view.getKhachHangTableModel();
+        tableModel.setRowCount(0);
+
+        for (KhachHangStatsDto row : rows) {
+            tableModel.addRow(new Object[]{
+                    row.getTenKhachHang(),
+                    row.getSoHoaDon(),
+                    row.getTongSoLuong(),
+                    MONEY_FORMAT.format(row.getTongDoanhThu())
             });
         }
     }

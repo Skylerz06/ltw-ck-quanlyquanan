@@ -1,7 +1,6 @@
 package ltw.ck.quanlyquanan.services;
 
 import ltw.ck.quanlyquanan.model.dto.ChiTietHDDto;
-
 import ltw.ck.quanlyquanan.model.entity.Ban;
 import ltw.ck.quanlyquanan.model.entity.HoaDon;
 import ltw.ck.quanlyquanan.model.entity.KhachHang;
@@ -33,6 +32,8 @@ public interface HoaDonService {
                   Ban ban,
                   HoaDonStatus trangThai,
                   List<ItemData> items);
+
+    KhachHang resolveKhachHang(KhachHang khachHangDangChon, String tenKhachHangNhap);
 
     FormData toFormData(HoaDon hoaDon);
     List<HistoryRow> toHistoryRows(List<HoaDon> hoaDons);
@@ -93,5 +94,3 @@ public interface HoaDonService {
         }
     }
 }
-
-

@@ -1,9 +1,11 @@
 package ltw.ck.quanlyquanan.services;
 
+import ltw.ck.quanlyquanan.model.dto.BanStatsDto;
+import ltw.ck.quanlyquanan.model.dto.HoaDonRowDto;
 import ltw.ck.quanlyquanan.model.dto.HoaDonStatsDto;
+import ltw.ck.quanlyquanan.model.dto.KhachHangStatsDto;
 import ltw.ck.quanlyquanan.model.dto.MonAnStatsDto;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -12,19 +14,10 @@ public interface ThongKeService {
 
     record Result(
             HoaDonStatsDto hoaDonStats,
-            List<HoaDonRow> hoaDonRows,
-            List<MonAnStatsDto> monAnStats
-    ) {
-    }
-
-    record HoaDonRow(
-            Long maHd,
-            LocalDateTime ngayLap,
-            String tenKhachHang,
-            String tenNhanVien,
-            String tenBan,
-            int tongSoLuong,
-            double tongTien
+            List<HoaDonRowDto> hoaDonRows,
+            List<MonAnStatsDto> monAnStats,
+            List<BanStatsDto> banRows,
+            List<KhachHangStatsDto> khachHangRows
     ) {
     }
 }
